@@ -1,0 +1,11 @@
+---
+
+- name: ROLE | Debian | Task
+  ansible.builtin.apt:
+    pkg: "{{ something }}"
+  tags: [base]
+
+- name:
+  community.general.modprobe:
+    name: 'wireguard'
+    state: present

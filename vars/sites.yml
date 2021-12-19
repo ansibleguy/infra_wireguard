@@ -1,0 +1,69 @@
+---
+
+# this site-config is used to configure site-specific settings
+
+example_wg_sites:
+  - HQ:
+    uplinks:
+      0:  # priority/id
+        name: 'FIBRE_1G'
+        EndpointDNS: 'hq_ul1.template.ansibleguy.net'
+      1:
+        name: 'FIBRE_300M'
+        EndpointDNS: 'hq_ul2.template.ansibleguy.net'
+      2:
+        name: 'COPPER_100M'
+        EndpointDNS: 'hq_ul3.template.ansibleguy.net'
+    prio_step: 10
+      # how much the priority impacts the metric
+      # [base_metric + (prio * step)]
+    networks:
+      - '172.16.0.0/23'
+      - '192.168.66.0/24'
+
+  - BO_1:
+    uplinks:
+      0:
+        name: 'FIBRE_100M'
+        EndpointDNS: 'bo1_ul1.template.ansibleguy.net'
+      1:
+        name: 'LTE_100M'
+        EndpointDNS: 'bo1_ul2.template.ansibleguy.net'
+    prio_step: 10
+    networks: ['172.17.1.0/24']
+
+  - BO_2:
+    uplinks:
+      0:
+        name: 'FIBRE_500M'
+        EndpointDNS: 'bo2_ul1.template.ansibleguy.net'
+      1:
+        name: 'COPPER_100M'
+        EndpointDNS: 'bo2_ul2.template.ansibleguy.net'
+    prio_step: 10
+    networks:
+      - '172.17.2.0/24'
+      - '192.168.94.0/24'
+
+  - BO_3:
+    uplinks:
+      0:
+        name: 'FIBRE_50M'
+        EndpointDNS: 'bo3_ul1.template.ansibleguy.net'
+      1:
+        name: 'LTE_30M'
+        EndpointDNS: 'bo3_ul2.template.ansibleguy.net'
+    prio_step: 15
+    networks: ['172.17.3.0/24']
+
+  - BO_4:
+    uplinks:
+      0:
+        name: 'FIBRE_50M'
+        EndpointDNS: 'bo4_ul1.template.ansibleguy.net'
+      1:
+        name: 'LTE_20M'
+        EndpointDNS: 'bo4_ul2.template.ansibleguy.net'
+    prio_step: 20
+    networks: ['172.17.4.0/24']
+

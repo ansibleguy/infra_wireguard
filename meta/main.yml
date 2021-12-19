@@ -1,0 +1,18 @@
+---
+
+galaxy_info:
+  author: 'AnsibleGuy <guy@ansibleguy.net>'
+  readme: 'README.md'
+  license: 'MIT'
+  repository: 'https://github.com/ansibleguy/ROLE'
+  issue_tracker_url: 'https://github.com/ansibleguy/ROLE/issues'
+  github_branch: 'stable'
+  min_ansible_version: 2.9.0
+  description: ''
+  platforms:
+    - name: Debian
+      versions:
+        - bullseye
+  galaxy_tags: []
+
+collections: []

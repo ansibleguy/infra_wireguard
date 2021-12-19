@@ -1,0 +1,96 @@
+---
+
+# this group-config is used to configure topologies across multiple sites
+
+example_wg_groups:
+  branchOfficeDynamic:
+    # tunnel ip's get assigned semi-automatically
+    #  each center node needs to have a network configured
+    #  each peer needs to have a network_id assigned (1 to N)
+    topology:
+      type: 'star'  # members are connected to their central hubs
+      centers:
+        HQ:
+          prio: 0
+          tunnel_network: '10.0.0.0/24'  # network-syntax as compatible with Python3's 'netaddr' module
+          tunnel_ids: [1,2,3]  # for BO_2 connection
+        BO_2:
+          prio: 1
+          tunnel_network: '10.0.1.0/24'
+          tunnel_id: [1,2,3]  # for HQ connection
+      prio_step: 10
+
+    routing:
+      type: 'static'
+      networks: # traffic to route through tunnel (if not locally used => local metric is lower)
+        - '192.168.0.0/16'
+        - '172.16.0.0/12'
+        - '10.0.0.0/8'
+
+    peers:
+      BO_1:
+        PublicKey: 'TrMvSoP4jYQlY6RIzBgbssQqY3vxI2Pi+y71lOWWXX0='
+        tunnel_ids: [4,5]
+      BO_3:
+        PublicKeyPath: '/etc/wireguard/peers/bo3.pub'
+        tunnel_ids: [6,7]
+      BO_4:
+        PublicKeyPath: '/etc/wireguard/peers/bo4.pub'
+        tunnel_ids: [8,9]
+
+  branchOfficeStatic:
+    topology:
+      type: 'star'  # members are connected to their central hubs
+      centers:
+        - name: 'HQ'
+          prio: 0
+          TunnelIP_HQ:
+            0: '10.0.0.1/24'
+            1: '10.0.0.2/24'
+            2: '10.0.0.3/24'
+          TunnelIP_BO_2: '10.0.1.2/24'
+        - name: 'BO_2'
+          prio: 1
+          TunnelIP_HQ: '10.0.0.2/24'
+          TunnelIP_BO_2: '10.0.1.1/24'
+      prio_step: 10
+
+    routing:
+      type: 'static'
+      networks:  # private-ip traffic to route through tunnel (if not locally used => local metric is lower)
+        - '192.168.0.0/16'
+        - '172.16.0.0/12'
+        - '10.0.0.0/8'
+
+    peers:
+      BO_1:
+        PublicKey: 'TrMvSoP4jYQlY6RIzBgbssQqY3vxI2Pi+y71lOWWXX0='
+        TunnelIP_HQ: '10.0.0.10/24'
+        TunnelIP_BO_2: '10.0.1.10/24'
+      BO_3:
+        PublicKeyPath: '/etc/wireguard/peers/bo3.pub'
+        TunnelIP_HQ: '10.0.0.11/24'
+        TunnelIP_BO_2: '10.0.1.11/24'
+      BO_4:
+        PublicKeyPath: '/etc/wireguard/peers/bo4.pub'
+        TunnelIP_HQ: '10.0.0.12/24'
+        TunnelIP_BO_2: '10.0.1.12/24'
+
+
+  datacenters:
+    topology:
+      type: 'mesh'  # each node connected to every other node
+      metric: 100
+
+    peers:
+      HQ:
+        PublicKeyPath: '/etc/wireguard/peers/hq.pub'
+      GCP_1:
+        PublicKeyPath: '/etc/wireguard/peers/gcp1.pub'
+      AWS_1:
+        PublicKeyPath: '/etc/wireguard/peers/aws1.pub'
+      HETZNER_1:
+        PublicKeyPath: '/etc/wireguard/peers/hetzner1.pub'
+
+    routing:
+      type: 'static'

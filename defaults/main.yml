@@ -1,0 +1,65 @@
+---
+
+# todo: think about a smart way to manage many meshed endpoint
+#   split tunnel & site config
+#   allow linking of sites in the tunnel by key
+# todo: static and/or dynamic routing
+#   can use postup/postdown hooks to script
+#   automatically use site-specific subnets
+#   allow additional tunnel-specific routes (needed for pure routing node)
+
+WG_HC:
+  packages: ['wireguard', 'wireguard-tools']
+  int_prefix: 'wg_'
+  sysctl:
+    'net.ipv4.ip_forward': 1
+    'net.ipv4.conf.all.proxy_arp': 1
+  path_config: '/etc/wireguard'
+  tunnel_ip_prefix: 'TunnelIP_'
+  default_port: 51820
+
+# default config => is overwritten by provided config
+default_wg:
+  tunnels: {}
+  sites: {}
+  groups: {}
+
+  path_private: "{{ WG_HC.path_config }}/private"
+  path_public_keys: "{{ WG_HC.path_config }}/peers"
+  base_metric: 100
+  dynamic_ip:
+    reserve_for_gw: 5
+    # maximum number of uplinks that will EVER be used for your center/hub servers
+    # th
+
+
+WG_CONFIG: "{{ default_wg | combine(wireguard_s2s, recursive=true) }}"
+
+default_tunnel_config:
+  peers: {}
+  PrivateKey: ''
+  PrivateKeyPath: ''
+  ListenPort: "{{ WG_HC.default_port }}"
+  Address: ''
+  FwMark: ''
+  DNS:
+    - '1.1.1.1'
+    - '8.8.8.8'
+  MTU: 1500
+
+default_peer_config:
+  PublicKey: ''  # if not set => will be temporarily be set to random pubkey
+  PublicKeyPath: ''
+  PresharedKey: ''
+  PresharedKeyPath: ''
+  # Endpoint: ''
+  EndpointIP: ''
+  EndpointPort: "{{ WG_HC.default_port }}"
+  AllowedIPs:
+    - '0.0.0.0/0'
+    - '::/0'
+  PersistentKeepalive:  # to use if the connection is NATed
+    enable: false
+    secs: 10
+
+wg_groups: {}

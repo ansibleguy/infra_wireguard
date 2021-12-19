@@ -1,0 +1,128 @@
+# {{ ansible_managed }}
+# ansibleguy.infra_wireguard_s2s
+
+# topology: star
+# type: center/hub
+
+{{ tunnel_config }}
+
+# routing
+
+
+
+# vars to set: group, base_metric, if_name, this_server_name, this_server, ip_addressing, tunnel
+# routes
+{# todo: dynamic routing alternative #}
+# todo: problem = multi-wan support; config does not yet used N tunnel-ips per peer (as needed for routing)
+
+
+
+
+
+
+# getting
+{% if group.topology.centers | length > 1 %}
+#  connection to other center-servers
+{%   for name, center in group.topology.centers.items() %}
+{%     if name != this_server_name %}
+#   center-server '{{ name }}'
+{%       if ip_addressing == 'static' %}
+{%         set gateway = center[tunnel_ip_key] %}
+{%       else %}
+{%         set gateway = this_server.tunnel_network | get_ip_by_id(center.tunnel_id, true) %}
+{%       endif %}
+{%       set site = WG_CONFIG.sites[name] %}
+{%       for uplink in site.uplinks.values() %}
+{%         set metric = WG_CONFIG.base_metric + (center.prio * center.prio_step | default(group.topology.prio_step) ) + (uplink.prio * uplink.prio_step | default(site.prio_step) ) %}
+{%         for nw in site.networks %}
+PostUp = /usr/sbin/ip route add {{ nw }} via {{ gateway }} dev %i metric {{ metric }}
+
+{%         endfor %}
+
+{%         for nw in group.routing.networks %}
+PostUp = /usr/sbin/ip route add {{ nw }} via {{ gateway }} dev %i metric {{ metric }}
+{%         endfor %}
+
+{%       endfor %}
+
+{%     endif %}
+{%   endfor %}
+{% endif %}
+
+
+#  connections to edge-peers
+
+
+
+
+{% for peer, peer_config in group.peers.items() %}
+{%   if ip_addressing == 'static' %}
+{%     set gateway = peer_config[tunnel_ip_key] %}
+{%   else %}
+{%     set gateway = this_server.tunnel_network | get_ip_by_id(peer_config.tunnel_id, true) %}
+{%   endif %}
+{%   set site = WG_CONFIG.sites[peer] %}
+{%   for uplink in site.uplinks.values() %}
+{%     set metric = base_metric + (uplink.prio * uplink.prio_step | default(site.prio_step) ) %}
+{%     for nw in site.networks %}
+PostUp = /usr/sbin/ip route add {{ nw }} via {{ gateway }} dev %i metric {{ metric }}
+{%     endfor %}
+
+{%   endfor %}
+
+{% endfor %}
+
+
+{% if 'PreUp' in tunnel or 'PostUp' in tunnel or 'PreDown' in tunnel or 'PostDown' in tunnel %}
+# scripts
+{%   if 'PreUp' in tunnel %}
+{%     for cmd in tunnel.PreUp %}
+PreUp = {{ cmd }}
+{%     endfor %}
+{%   endif %}
+
+{%   if 'PostUp' in tunnel %}
+{%     for cmd in tunnel.PostUp %}
+PostUp = {{ cmd }}
+{%     endfor %}
+{%   endif %}
+
+{%   if 'PreDown' in tunnel %}
+{%     for cmd in tunnel.PreDown %}
+PreDown = {{ cmd }}
+{%     endfor %}
+{%   endif %}
+
+{%   if 'PostDown' in tunnel %}
+{%     for cmd in tunnel.PostDown %}
+PostDown = {{ cmd }}
+{%     endfor %}
+{%   endif %}
+{% endif %}
+
+{% for peer in peers %}
+{%   set site = WG_CONFIG.sites[peer] %}
+[Peer]
+Endpoint =
+# authentication
+{%   if peer.PublicKeyPath != '' and peer.PublicKey == '' %}
+PostUp = /usr/bin/wg set %i peer {{ peer.PublicKeyPath }}
+{%   elif peer.PublicKey == '' %}
+#  randomly generated public-key => since there was none supplied in the config!
+PublicKey = {{ lookup('password', '/dev/null chars=ascii_letters,digits length=58') + '0K' | b64encode }}
+{%   else %}
+PublicKey = {{ peer.PublicKey }}
+{%   endif %}
+
+{%   if peer.PresharedKeyPath != '' and peer.PresharedKey == '' %}
+PostUp = /usr/bin/wg set %i preshared-key {{ peer.PresharedKeyPath }}
+{%   elif peer.PresharedKey != '' %}
+PresharedKey = {{ peer.PresharedKey }}
+{%   endif %}
+
+# security filtering
+{%   for nw in peer.AllowedIPs %}{{ nw }}{% if not loop.last %}, {% endif %}{% endfor %}
+
+#
+PersistentKeepalive =
+{% endfor %}

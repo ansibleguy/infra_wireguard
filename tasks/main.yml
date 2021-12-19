@@ -1,0 +1,21 @@
+---
+
+- name: Wireguard S2S | Installing dependencies on controller
+  ansible.builtin.pip:
+    name: 'netaddr'
+    state: present
+  delegate_to: localhost
+  register: install_controller_requirements
+  ignore_errors: true
+  become: false
+
+- name: Wireguard S2S | Notify User
+  ansible.builtin.pause:
+    prompt: "You need to install the python3 module 'netaddr' for this role to work correctly!"
+  when:
+    - install_controller_requirements.failed is defined
+    - install_controller_requirements.failed
+
+- name: Wireguard S2S | Processing debian config
+  ansible.builtin.import_tasks: debian/main.yml
+  when: "ansible_distribution|lower in ['debian', 'ubuntu']"

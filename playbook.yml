@@ -1,0 +1,9 @@
+---
+
+# ansible-playbook -K -D -i inventory/hosts.yml playbook.yml
+
+- hosts: all   # should be limited
+  become: true
+  gather_facts: yes
+  roles:
+  - ansibleguy.ROLE

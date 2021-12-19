@@ -1,0 +1,32 @@
+---
+
+- name: "Wireguard S2S | Debian | Add Tunnel {{ }} | Checking if key exists"
+  ansible.builtin.stat:
+    path: "{{ mariadb_default_instance_settings.datadir }}/mysql"
+  register: wg_key_file
+
+- name: Gerating tunnel config for this site  # same config for all types
+  ansible.builtin.set_fact:
+    tunnel_config: >
+      [Interface]
+      ListenPort = {{ tunnel.ListenPort }}
+      DNS = {% for dns in tunnel.DNS %}{{ dns }}{% if not loop.last %}, {% endif %}{% endfor %}
+      MTU = {{ tunnel.MTU }}
+
+      # authentication
+      {% if tunnel.PrivateKeyPath != '' and tunnel.PrivateKey == '' %}
+      PostUp = /usr/bin/wg set %i private-key {{ tunnel.PrivateKeyPath }}
+      {% else %}
+      PrivateKey = {{ tunnel.PrivateKey }}
+      {% endif %}
+
+      # optional
+      {% if tunnel.Address != '' %}
+      Address = {{ tunnel.Address }}
+      {% endif %}
+      {% if tunnel.FwMark != '' %}
+      FwMark = {{ tunnel.FwMark }}
+      {% endif %}
+      {% if 'Table' in tunnel %}
+      Table = {{ tunnel.Table }}
+      {% endif %}
