@@ -1,0 +1,34 @@
+# {{ ansible_managed }}
+# ansibleguy.infra_wireguard
+
+# topology: single
+
+[Interface]
+Address = {% for ip in wg_local.Address | ensure_list %}{{ ip }}{% if not loop.last %}, {% endif %}{% endfor %}
+
+ListenPort = {{ wg_local.ListenPort }}
+PostUp = wg set %i private-key {{ privkey_file_full }}
+MTU = {{ wg_local.MTU }}
+Table = {{ wg_local.Table }}
+DNS = {% for dns in wg_local.DNS | ensure_list %}{{ dns }}{% if not loop.last %}, {% endif %}{% endfor %}
+
+{% for script_key in ['PreUp', 'PostUp', 'PreDown', 'PostDown'] %}
+{%   for script in wg_local[script_key] | ensure_list %}
+{{ script_key }} = {{ script }}
+{%   endfor %}
+{% endfor %}
+
+
+[Peer]
+PublicKey = {{ lookup('file', peer_pubkey_file) }}
+{% if topology.psk %}
+PresharedKey = {{ lookup('file', psk_file) }}
+{% endif %}
+AllowedIPs = {% for ip in wg_peer.Address | ensure_list %}{{ ip.split('/')[0] }}{% if ip | ansible.netcommon.ipv4 %}/32{% else %}/128{% endif %}{% if not loop.last %}, {% endif %}{% endfor %}{% for net in wg_peer.AllowedIPs | ensure_list %}, {{ net }}{% endfor %}
+
+{% if wg_peer.Endpoint != '' %}
+Endpoint = {{ wg_peer.Endpoint }}:{{ wg_peer.EndpointPort }}
+{% endif %}
+{% if wg_peer.PersistentKeepalive != 0 %}
+PersistentKeepalive = {{ wg_peer.PersistentKeepalive }}
+{% endif %}

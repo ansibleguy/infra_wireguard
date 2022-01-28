@@ -1,0 +1,73 @@
+---
+
+- ansible.builtin.set_fact:
+    pubkey_file: "{{ name }}_{{ host }}.{{ WG_HC.ext.pub }}"
+    privkey_file: "{{ name }}_{{ host }}.{{ WG_HC.ext.key }}"
+    privkey_file_full: "{{ WG_CONFIG.path_keys }}/{{ name }}_{{ host }}.{{ WG_HC.ext.key }}"
+
+- name: Wireguard | Debian | Host | Checking if key exist on the controller
+  ansible.builtin.stat:
+    path: "{{ role_path }}/files/keys/{{ privkey_file }}"
+  register: wg_key_file
+  delegate_to: localhost
+  become: false
+
+- name: Wireguard | Debian | Host | Checking if pub-key exist on the controller
+  ansible.builtin.stat:
+    path: "{{ role_path }}/files/keys/{{ pubkey_file }}"
+  register: wg_pub_file
+  delegate_to: localhost
+  become: false
+
+- name: Wireguard | Debian | Host | Generating missing key
+  ansible.builtin.command: 'wg genkey'
+  when: not wg_key_file.stat.exists
+  register: wg_key_gen
+  no_log: true
+
+- name: Wireguard | Debian | Host | Writing key to file on controller
+  ansible.builtin.copy:
+    content: "{{ wg_key_gen.stdout }}"
+    dest: "{{ role_path }}/files/keys/{{ privkey_file }}"
+    mode: 0640
+  delegate_to: localhost
+  become: false
+  when: not wg_key_file.stat.exists
+  no_log: true
+
+- name: Wireguard | Debian | Host | Generating missing public-key
+  ansible.builtin.command: 'wg pubkey'
+  args:
+    stdin: "{{ wg_key_gen.stdout }}"
+  when: not wg_pub_file.stat.exists
+  register: wg_pub_gen
+  no_log: true
+
+- name: Wireguard | Debian | Host | Writing public-key to file on controller
+  ansible.builtin.copy:
+    content: "{{ wg_pub_gen.stdout }}"
+    dest: "{{ role_path }}/files/keys/{{ pubkey_file }}"
+    mode: 0644
+  delegate_to: localhost
+  become: false
+  when: not wg_key_file.stat.exists
+  no_log: true
+
+- name: Wireguard | Debian | Host | Copying keys to target host
+  ansible.builtin.copy:
+    src: "files/keys/{{ item }}"
+    dest: "{{ WG_CONFIG.path_keys }}/{{ item }}"
+    owner: 'root'
+    group: 'root'
+    mode: 0400
+  loop:
+    - "{{ privkey_file }}"
+    - "{{ pubkey_file }}"
+  when: inventory_hostname == host
+  no_log: true
+
+- name: Wireguard | Debian | Host | Configuring tunnel for topology 'single'
+  ansible.builtin.include_tasks: single.yml
+  when:
+    - topology.type == 'single'
+    - inventory_hostname == host

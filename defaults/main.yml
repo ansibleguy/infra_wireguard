@@ -1,65 +1,57 @@
 ---
 
-# todo: think about a smart way to manage many meshed endpoint
-#   split tunnel & site config
-#   allow linking of sites in the tunnel by key
-# todo: static and/or dynamic routing
-#   can use postup/postdown hooks to script
-#   automatically use site-specific subnets
-#   allow additional tunnel-specific routes (needed for pure routing node)
-
 WG_HC:
-  packages: ['wireguard', 'wireguard-tools']
-  int_prefix: 'wg_'
-  sysctl:
-    'net.ipv4.ip_forward': 1
-    'net.ipv4.conf.all.proxy_arp': 1
   path_config: '/etc/wireguard'
-  tunnel_ip_prefix: 'TunnelIP_'
   default_port: 51820
+  ext:
+    key: 'key'
+    pub: 'pub'
+    psk: 'psk'
+
+  sysctl:
+    forwarding:
+      enable:
+        'net.ipv4.ip_forward': 1
+        'net.ipv4.conf.all.arp_filter': 0
+        'net.ipv4.conf.all.rp_filter': 2
+      disable:
+        'net.ipv4.ip_forward': 0
 
 # default config => is overwritten by provided config
 default_wg:
-  tunnels: {}
-  sites: {}
-  groups: {}
+  topologies: {}
+  path_keys: "{{ WG_HC.path_config }}/keys"
+  support:
+    dns: true
+    traffic_forwarding: false
+  log_prefix: 'wireguard'
 
-  path_private: "{{ WG_HC.path_config }}/private"
-  path_public_keys: "{{ WG_HC.path_config }}/peers"
-  base_metric: 100
-  dynamic_ip:
-    reserve_for_gw: 5
-    # maximum number of uplinks that will EVER be used for your center/hub servers
-    # th
+WG_CONFIG: "{{ default_wg | combine(wireguard, recursive=true) }}"
 
-
-WG_CONFIG: "{{ default_wg | combine(wireguard_s2s, recursive=true) }}"
-
-default_tunnel_config:
+default_topology_config:
+  type: 'single'  # star/mesh
   peers: {}
-  PrivateKey: ''
-  PrivateKeyPath: ''
+  psk: true
+
+default_local_config:
+  peers: {}
   ListenPort: "{{ WG_HC.default_port }}"
-  Address: ''
+  Address: ['']
   FwMark: ''
   DNS:
     - '1.1.1.1'
     - '8.8.8.8'
   MTU: 1500
+  PreUp: []
+  PostUp: []
+  PreDown: []
+  PostDown: []
+  Table: 'off'  # set to number (p.e. 1000) to enable auto-added routes => if you do so, you will most probably need to modify your peers 'AllowedIPs' or lock yourself out (;
 
 default_peer_config:
-  PublicKey: ''  # if not set => will be temporarily be set to random pubkey
-  PublicKeyPath: ''
-  PresharedKey: ''
-  PresharedKeyPath: ''
-  # Endpoint: ''
-  EndpointIP: ''
+  Endpoint: ''
   EndpointPort: "{{ WG_HC.default_port }}"
   AllowedIPs:
     - '0.0.0.0/0'
     - '::/0'
-  PersistentKeepalive:  # to use if the connection is NATed
-    enable: false
-    secs: 10
-
-wg_groups: {}
+  PersistentKeepalive: 0  # set to 25 if the connection is NATed

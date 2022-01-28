@@ -3,16 +3,21 @@
 galaxy_info:
   author: 'AnsibleGuy <guy@ansibleguy.net>'
   readme: 'README.md'
-  license: 'MIT'
-  repository: 'https://github.com/ansibleguy/ROLE'
-  issue_tracker_url: 'https://github.com/ansibleguy/ROLE/issues'
+  license: 'GPLv3'
+  repository: 'https://github.com/ansibleguy/infra_wireguard'
+  issue_tracker_url: 'https://github.com/ansibleguy/infra_wireguard/issues'
   github_branch: 'stable'
   min_ansible_version: 2.9.0
-  description: ''
+  description: 'Role to configure WireGuard Site-to-Site tunnels - topology-based'
   platforms:
     - name: Debian
       versions:
         - bullseye
-  galaxy_tags: []
+  galaxy_tags:
+    - 'networking'
+    - 'vpn'
+    - 'wireguard'
+    - 'sitetosite'
+    - 'ipsec'
 
 collections: []

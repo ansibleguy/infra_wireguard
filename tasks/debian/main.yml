@@ -1,11 +1,60 @@
 ---
 
-- name: ROLE | Debian | Task
+- name: Wireguard | Debian | Installing WireGuard
   ansible.builtin.apt:
-    pkg: "{{ something }}"
-  tags: [base]
+    pkg: ['wireguard']
 
-- name:
-  community.general.modprobe:
-    name: 'wireguard'
+- name: Wireguard | Debian | Installing WireGuard DNS-Util
+  ansible.builtin.apt:
+    pkg: ['resolvconf']
+  when: WG_CONFIG.support.dns
+
+- name: Wireguard | Debian | Configuring sysctl to allow traffic forwarding
+  ansible.posix.sysctl:
+    name: "{{ item.key }}"
+    value: "{{ item.value }}"
+    sysctl_set: yes
     state: present
+    reload: yes
+  with_dict: "{{ WG_HC.sysctl.forwarding.enable }}"
+  when: WG_CONFIG.support.traffic_forwarding
+  tags: routing
+
+- name: Wireguard | Debian | Configuring sysctl to dis-allow traffic forwarding
+  ansible.posix.sysctl:
+    name: "{{ item.key }}"
+    value: "{{ item.value }}"
+    sysctl_set: yes
+    state: present
+    reload: yes
+  with_dict: "{{ WG_HC.sysctl.forwarding.disable }}"
+  when: WG_CONFIG.support.traffic_forwarding
+  tags: routing
+
+- name: Wireguard | Debian | Creating directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0755
+    owner: 'root'
+    group: 'root'
+  loop:
+    - "{{ WG_HC.path_config }}"
+    - "{{ WG_CONFIG.path_keys }}"
+    - "/etc/systemd/system/wg-quick@.service.d"
+
+- name: Wireguard | Debian | Adding service settings
+  ansible.builtin.template:
+    src: 'templates/etc/systemd/system/wg-quick@.service.d/override.conf.j2'
+    dest: '/etc/systemd/system/wg-quick@.service.d/override.conf'
+
+- name: Wireguard | Debian | Processing topologies
+  ansible.builtin.include_tasks: topology.yml
+  when: "inventory_hostname in topology.peers"
+  vars:
+    name: "{{ topo_item.key }}"
+    topology: "{{ topo_item.value }}"
+  loop_control:
+    loop_var: topo_item
+  with_dict: "{{ WG_CONFIG.topologies }}"
+  no_log: true

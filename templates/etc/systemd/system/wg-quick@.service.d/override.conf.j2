@@ -1,0 +1,10 @@
+# {{ ansible_managed }}
+# ansibleguy.infra_wireguard
+
+[Unit]
+Documentation=https://github.com/ansibleguy/infra_wireguard
+
+[Service]
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier={{ WG_CONFIG.log_prefix }}_%i

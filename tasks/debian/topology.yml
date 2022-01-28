@@ -1,0 +1,40 @@
+---
+
+- ansible.builtin.set_fact:
+    psk_file: "{{ role_path }}/files/keys/{{ name }}.{{ WG_HC.ext.psk }}"
+
+- name: Wireguard | Debian | Topology | Checking if psk exists on the controller
+  ansible.builtin.stat:
+    path: "{{ psk_file }}"
+  register: wg_psk_file
+  delegate_to: localhost
+  become: false
+  when: topology.psk
+
+- name: Wireguard | Debian | Topology | Generating missing psk
+  ansible.builtin.command: 'wg genpsk'
+  register: wg_psk_gen
+  when:
+    - topology.psk
+    - not wg_psk_file.stat.exists
+
+- name: Wireguard | Debian | Topology | Writing psk to file on controller
+  ansible.builtin.copy:
+    content: "{{ wg_psk_gen.stdout }}"
+    dest: "{{ psk_file }}"
+    mode: 0640
+  delegate_to: localhost
+  become: false
+  when:
+    - topology.psk
+    - not wg_psk_file.stat.exists
+
+- name: Wireguard | Debian | Topology | Processing hosts
+  ansible.builtin.include_tasks: host.yml
+  vars:
+    host: "{{ host_item.key }}"
+    wg_local: "{{ default_local_config | combine(host_item.value, recursive=true) }}"
+  loop_control:
+    loop_var: host_item
+  with_dict: "{{ topology.peers }}"
+  no_log: true

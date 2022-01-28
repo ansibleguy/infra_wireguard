@@ -1,21 +1,17 @@
 ---
 
-- name: Wireguard S2S | Installing dependencies on controller
-  ansible.builtin.pip:
-    name: 'netaddr'
-    state: present
-  delegate_to: localhost
-  register: install_controller_requirements
-  ignore_errors: true
-  become: false
+- name: Wireguard | Checking config
+  ansible.builtin.fail:
+    msg: "The required configuration was not provided!
+    Needed: 'wireguard', 'wireguard.topologies'"
+  when: >
+    wireguard is undefined or
+    wireguard.topologies is undefined
 
-- name: Wireguard S2S | Notify User
-  ansible.builtin.pause:
-    prompt: "You need to install the python3 module 'netaddr' for this role to work correctly!"
-  when:
-    - install_controller_requirements.failed is defined
-    - install_controller_requirements.failed
+- name: Wireguard | Skipping host => not configured in any wireguard-topology
+  ansible.builtin.meta: end_host
+  when: "inventory_hostname not in wireguard.topologies | flatten_hosts"
 
-- name: Wireguard S2S | Processing debian config
+- name: Wireguard | Processing debian config
   ansible.builtin.import_tasks: debian/main.yml
   when: "ansible_distribution|lower in ['debian', 'ubuntu']"
