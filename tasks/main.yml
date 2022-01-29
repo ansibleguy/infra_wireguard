@@ -7,10 +7,12 @@
   when: >
     wireguard is undefined or
     wireguard.topologies is undefined
+  tags: [purge, tunnels, config]
 
 - name: Wireguard | Skipping host => not configured in any wireguard-topology
   ansible.builtin.meta: end_host
   when: "inventory_hostname not in wireguard.topologies | flatten_hosts"
+  tags: [purge, tunnels, config]
 
 - name: Wireguard | Processing debian config
   ansible.builtin.import_tasks: debian/main.yml

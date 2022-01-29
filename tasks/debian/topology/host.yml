@@ -1,0 +1,30 @@
+---
+
+- name: "Wireguard | Debian | Topology {{ topo_name }} | Host | Copying keys to target host"
+  ansible.builtin.copy:
+    src: "files/keys/{{ item }}"
+    dest: "{{ WG_CONFIG.path_keys }}/{{ item }}"
+    owner: 'root'
+    group: 'root'
+    mode: 0400
+  loop:
+    - "{{ topo_name }}_{{ host }}.{{ WG_HC.ext.pub }}"
+    - "{{ topo_name }}_{{ host }}.{{ WG_HC.ext.key }}"
+  no_log: true
+  tags: [tunnels, config]
+
+- name: "Wireguard | Debian | Topology {{ topo_name }} | Host | Configuring tunnel for topology 'single'"
+  ansible.builtin.include_tasks: tunnel/single.yml
+  vars:
+    privkey_file_full: "{{ WG_CONFIG.path_keys }}/{{ topo_name }}_{{ host }}.{{ WG_HC.ext.key }}"
+    int_name: "{{ WG_CONFIG.int_prefix.single + '_' + topo_name | safe_int_name }}"
+  when: topology.type == 'single'
+  tags: [tunnels, config]
+
+- name: "Wireguard | Debian | Topology {{ topo_name }} | Host | Configuring tunnel for topology 'star'"
+  ansible.builtin.include_tasks: tunnel/star.yml
+  vars:
+    privkey_file_full: "{{ WG_CONFIG.path_keys }}/{{ topo_name }}_{{ host }}.{{ WG_HC.ext.key }}"
+    int_name: "{{ WG_CONFIG.int_prefix.star + '_' + topo_name | safe_int_name }}"
+  when: topology.type == 'star'
+  tags: [tunnels, config]

@@ -1,0 +1,25 @@
+---
+
+- name: "Wireguard | Debian | Topology {{ topo_name }} | Single | Tunnel | Getting peer config"
+  ansible.builtin.set_fact:
+    wg_peer: "{{ default_peer_config | combine(peer_item.value, recursive=true) }}"
+    peer_pubkey_file: "{{ role_path }}/files/keys/{{ topo_name }}_{{ peer_item.key }}.{{ WG_HC.ext.pub }}"
+  when: peer_item.key != inventory_hostname
+  loop_control:
+    loop_var: peer_item
+  with_dict: "{{ topology.peers }}"
+  tags: [tunnels, config]
+
+- name: "Wireguard | Debian | Topology {{ topo_name }} | Single | Tunnel | Configuring tunnel"
+  ansible.builtin.template:
+    src: 'templates/etc/wireguard/single.conf.j2'
+    dest: "/etc/wireguard/{{ int_name }}.conf"
+    owner: 'root'
+    group: 'root'
+    mode: 0640
+  register: wg_config
+  tags: [tunnels, config]
+
+- name: "Wireguard | Debian | Topology {{ topo_name }} | Single | Tunnel | Adding service"
+  ansible.builtin.include_tasks: service.yml
+  tags: [tunnels, config]

@@ -1,7 +1,0 @@
----
-
-- name: Wireguard | Debian | Tunnel | Stopping & Disabling tunnel service
-  ansible.builtin.systemd:
-    name: "wg-quick@{{ int_name }}.service"
-    enabled: false
-    state: stopped

@@ -1,0 +1,60 @@
+---
+
+- name: Wireguard | Debian | Purge | Getting list of tunnels that should exist
+  ansible.builtin.set_fact:
+    wg_wanted_ints: "{{ wireguard.topologies | flatten_ints(inventory_hostname, WG_CONFIG.int_prefix) }}"
+
+- name: Wireguard | Debian | Purge | Getting list of all enabled tunnel-services
+  ansible.builtin.shell: "systemctl list-units --state=loaded --full --no-pager | grep {{ WG_HC.wg_svc }}@ | cut -d ' ' -f3"
+  check_mode: false
+  changed_when: false
+  register: wg_svc_loaded
+
+- name: Wireguard | Debian | Purge | Stopping & Disabling tunnel-service
+  ansible.builtin.systemd:
+    name: "{{ loaded_svc }}"
+    enabled: false
+    state: stopped
+    daemon_reload: yes
+  when: "loaded_svc | replace(WG_HC.wg_svc + '@','') | replace('.service','') not in wg_wanted_ints"
+  register: wg_svc_removal
+  ignore_errors: true
+  loop_control:
+    loop_var: loaded_svc
+  loop: "{{ wg_svc_loaded.stdout_lines }}"
+
+- name: Wireguard | Debian | Purge | Removing non-existing tunnel-service-instances
+  ansible.builtin.command: 'systemctl reset-failed'
+  when:
+    - wg_svc_removal.changed is defined
+    - wg_svc_removal.changed
+
+# grepping as I found no way of filtering '.conf.swp' using find's 'name'-filter
+- name: Wireguard | Debian | Purge | Getting list of current configured tunnels
+  ansible.builtin.shell: "find {{ WG_HC.path_config }} -maxdepth 1 -type f -printf '%f\n' | grep '.conf$'"
+  register: wg_existing_ints
+  check_mode: false
+  changed_when: false
+  ignore_errors: true
+  failed_when: false
+  no_log: true
+
+- name: Wireguard | Debian | Purge | Stopping orphaned tunnel
+  ansible.builtin.command: "wg-quick down {{ existing_int | replace('.conf','') }}"
+  ignore_errors: true
+  failed_when: false
+  when:
+    - "existing_int | replace('.conf','') not in wg_wanted_ints"
+    - existing_int | replace('.conf','') != ''
+  loop_control:
+    loop_var: existing_int
+  loop: "{{ wg_existing_ints.stdout_lines }}"
+
+- name: Wireguard | Debian | Purge | Purging orphaned tunnel-config
+  ansible.builtin.file:
+    path: "{{ WG_HC.path_config }}/{{ existing_int }}"
+    state: absent
+  when: "existing_int | replace('.conf','') not in wg_wanted_ints"
+  loop_control:
+    loop_var: existing_int
+  loop: "{{ wg_existing_ints.stdout_lines }}"

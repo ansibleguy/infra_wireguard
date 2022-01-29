@@ -3,11 +3,24 @@
 - name: Wireguard | Debian | Installing WireGuard
   ansible.builtin.apt:
     pkg: ['wireguard']
+  tags: [base]
 
 - name: Wireguard | Debian | Installing WireGuard DNS-Util
   ansible.builtin.apt:
     pkg: ['resolvconf']
+  register: wg_resolvconf_setup
   when: WG_CONFIG.support.dns
+  tags: [base]
+
+# needed as the 'resolvconf' installation sometimes leads to temporary issues with name-resolution..
+- name: Wireguard | Debian | Restarting dns-daemon to enable DNS-Util
+  ansible.builtin.systemd:
+    name: 'systemd-resolved.service'
+    state: restarted
+  when:
+    - WG_CONFIG.support.dns
+    - wg_resolvconf_setup.changed
+  tags: [base]
 
 - name: Wireguard | Debian | Configuring sysctl to allow traffic forwarding
   ansible.posix.sysctl:
@@ -18,7 +31,7 @@
     reload: yes
   with_dict: "{{ WG_HC.sysctl.forwarding.enable }}"
   when: WG_CONFIG.support.traffic_forwarding
-  tags: routing
+  tags: [base]
 
 - name: Wireguard | Debian | Configuring sysctl to dis-allow traffic forwarding
   ansible.posix.sysctl:
@@ -29,7 +42,7 @@
     reload: yes
   with_dict: "{{ WG_HC.sysctl.forwarding.disable }}"
   when: WG_CONFIG.support.traffic_forwarding
-  tags: routing
+  tags: [base]
 
 - name: Wireguard | Debian | Creating directories
   ansible.builtin.file:
@@ -41,20 +54,30 @@
   loop:
     - "{{ WG_HC.path_config }}"
     - "{{ WG_CONFIG.path_keys }}"
-    - "/etc/systemd/system/wg-quick@.service.d"
+    - "/etc/systemd/system/{{ WG_HC.wg_svc }}@.service.d"
+  tags: [base, config]
 
 - name: Wireguard | Debian | Adding service settings
   ansible.builtin.template:
     src: 'templates/etc/systemd/system/wg-quick@.service.d/override.conf.j2'
-    dest: '/etc/systemd/system/wg-quick@.service.d/override.conf'
+    dest: "/etc/systemd/system/{{ WG_HC.wg_svc }}@.service.d/override.conf"
+  tags: [base, config]
+
+- name: Wireguard | Debian | Purging tunnels
+  ansible.builtin.import_tasks: purge.yml
+  when: WG_CONFIG.purge_orphaned_tunnels
+  tags: [purge, tunnels, config]
 
 - name: Wireguard | Debian | Processing topologies
-  ansible.builtin.include_tasks: topology.yml
-  when: "inventory_hostname in topology.peers"
+  ansible.builtin.include_tasks: topology/main.yml
+  when:
+    - "inventory_hostname in topology.peers"
+    - only_topo is undefined or only_topo == name
   vars:
-    name: "{{ topo_item.key }}"
-    topology: "{{ topo_item.value }}"
+    topo_name: "{{ topo_item.key | safe_int_name }}"
+    topology: "{{ default_topology_config | combine(topo_item.value, recursive=true) }}"
   loop_control:
     loop_var: topo_item
   with_dict: "{{ WG_CONFIG.topologies }}"
   no_log: true
+  tags: [purge, tunnels, config]

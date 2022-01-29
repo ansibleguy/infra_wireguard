@@ -1,25 +1,28 @@
 # {{ ansible_managed }}
 # ansibleguy.infra_wireguard
 
-# topology: {{ topology.type }}
-{% if topology.type == 'star' %}
-# role: {{ wg_local.role }}
-{% endif %}
+# topology: star
+# role: center
 
 {% include "base.conf.j2" %}
 
+{% for peer_name, raw_peer in wg_star_edges.items() %}
+{% set wg_peer = default_peer_config | combine(raw_peer, recursive=true) %}
 [Peer]
-PublicKey = {{ lookup('file', peer_pubkey_file) }}
-{% if topology.psk %}
+# {{ peer_name }}
+PublicKey = {{ lookup('file', role_path + '/files/keys/' + topo_name + '_' + peer_name + '.' + WG_HC.ext.pub) }}
+{%   if topology.psk %}
 PresharedKey = {{ lookup('file', psk_file) }}
-{% endif %}
+{%   endif %}
 AllowedIPs = {% for ip in wg_peer.Address | ensure_list %}{{ ip.split('/')[0] }}{% if ip | ansible.netcommon.ipv4 %}/32{% else %}/128{% endif %}{% if not loop.last %}, {% endif %}{% endfor %}{% for net in wg_peer.AllowedIPs | ensure_list %}, {{ net }}{% endfor %}
 
-{% if wg_peer.ListenPort != '' and wg_peer.Endpoint != '' %}
+{%   if wg_peer.ListenPort != '' and wg_peer.Endpoint != '' %}
 Endpoint = {{ wg_peer.Endpoint }}:{{ wg_peer.ListenPort }}
-{% endif %}
-{% if wg_peer.PersistentKeepalive != 0 %}
+{%   endif %}
+{%   if wg_peer.PersistentKeepalive != 0 %}
 PersistentKeepalive = {{ wg_peer.PersistentKeepalive }}
-{% elif wg_peer.NATed or topology.NATed %}
+{%   elif wg_peer.NATed or topology.NATed %}
 PersistentKeepalive = {{ WG_HC.default_keepalive }}
-{% endif %}
+{%   endif %}
+
+{% endfor %}

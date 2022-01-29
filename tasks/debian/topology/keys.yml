@@ -1,0 +1,60 @@
+---
+
+- ansible.builtin.set_fact:
+    pubkey_file: "{{ topo_name }}_{{ host }}.{{ WG_HC.ext.pub }}"
+    privkey_file: "{{ topo_name }}_{{ host }}.{{ WG_HC.ext.key }}"
+  tags: [tunnels, config]
+
+- name: "Wireguard | Debian | Topology {{ topo_name }} | {{ host }} keys | Checking if key exist on the controller"
+  ansible.builtin.stat:
+    path: "{{ role_path }}/files/keys/{{ privkey_file }}"
+  register: wg_key_file
+  delegate_to: localhost
+  become: false
+  tags: [tunnels, config]
+
+- name: "Wireguard | Debian | Topology {{ topo_name }} | {{ host }} keys | Checking if pub-key exist on the controller"
+  ansible.builtin.stat:
+    path: "{{ role_path }}/files/keys/{{ pubkey_file }}"
+  register: wg_pub_file
+  delegate_to: localhost
+  become: false
+  tags: [tunnels, config]
+
+- name: "Wireguard | Debian | Topology {{ topo_name }} | {{ host }} keys | Generating missing key"
+  ansible.builtin.command: 'wg genkey'
+  when: not wg_key_file.stat.exists
+  register: wg_key_gen
+  no_log: true
+  tags: [tunnels, config]
+
+- name: "Wireguard | Debian | Topology {{ topo_name }} | {{ host }} keys | Writing key to file on controller"
+  ansible.builtin.copy:
+    content: "{{ wg_key_gen.stdout }}"
+    dest: "{{ role_path }}/files/keys/{{ privkey_file }}"
+    mode: 0640
+  delegate_to: localhost
+  become: false
+  when: not wg_key_file.stat.exists
+  no_log: true
+  tags: [tunnels, config]
+
+- name: "Wireguard | Debian | Topology {{ topo_name }} | {{ host }} keys | Generating missing public-key"
+  ansible.builtin.command: 'wg pubkey'
+  args:
+    stdin: "{{ wg_key_gen.stdout }}"
+  when: not wg_pub_file.stat.exists
+  register: wg_pub_gen
+  no_log: true
+  tags: [tunnels, config]
+
+- name: "Wireguard | Debian | Topology {{ topo_name }} | {{ host }} keys | Writing public-key to file on controller"
+  ansible.builtin.copy:
+    content: "{{ wg_pub_gen.stdout }}"
+    dest: "{{ role_path }}/files/keys/{{ pubkey_file }}"
+    mode: 0644
+  delegate_to: localhost
+  become: false
+  when: not wg_key_file.stat.exists
+  no_log: true
+  tags: [tunnels, config]

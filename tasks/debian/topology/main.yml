@@ -1,0 +1,70 @@
+---
+
+- name: "Wireguard | Debian | Topology {{ topo_name }} | Checking config"
+  ansible.builtin.fail:
+    msg: 'UNSUPPORTED CONFIG: You have supplied a non-supported topology-type! Available: single, star, mesh'
+  when: "topology.type not in ['single', 'star', 'mesh']"
+  tags: [tunnels, config]
+
+- name: "Wireguard | Debian | Topology {{ topo_name }} | Checking star-config"
+  ansible.builtin.fail:
+    msg: 'UNSUPPORTED CONFIG: You have supplied more than one center-server for this star-topology!'
+  when:
+    - topology.type == 'star'
+    - not topology.peers | one_center
+  tags: [tunnels, config]
+
+- ansible.builtin.set_fact:
+    psk_file: "{{ role_path }}/files/keys/{{ topo_name }}.{{ WG_HC.ext.psk }}"
+  tags: [tunnels, config]
+
+- name: "Wireguard | Debian | Topology {{ topo_name }} | Checking if psk exists on the controller"
+  ansible.builtin.stat:
+    path: "{{ psk_file }}"
+  register: wg_psk_file
+  delegate_to: localhost
+  become: false
+  when: topology.psk
+  tags: [tunnels, config]
+
+- name: "Wireguard | Debian | Topology {{ topo_name }} | Generating missing psk"
+  ansible.builtin.command: 'wg genpsk'
+  register: wg_psk_gen
+  when:
+    - topology.psk
+    - not wg_psk_file.stat.exists
+  tags: [tunnels, config]
+
+- name: "Wireguard | Debian | Topology {{ topo_name }} | Writing psk to file on controller"
+  ansible.builtin.copy:
+    content: "{{ wg_psk_gen.stdout }}"
+    dest: "{{ psk_file }}"
+    mode: 0640
+  delegate_to: localhost
+  become: false
+  when:
+    - topology.psk
+    - not wg_psk_file.stat.exists
+  tags: [tunnels, config]
+
+- name: "Wireguard | Debian | Topology {{ topo_name }} | Checking host-keys"
+  ansible.builtin.include_tasks: keys.yml
+  vars:
+    host: "{{ host_item.key }}"
+  loop_control:
+    loop_var: host_item
+  with_dict: "{{ topology.peers }}"
+  no_log: true
+  tags: [tunnels, config]
+
+- name: "Wireguard | Debian | Topology {{ topo_name }} | Processing host"
+  ansible.builtin.include_tasks: host.yml
+  when: inventory_hostname == host
+  vars:
+    host: "{{ host_item.key }}"
+    wg_local: "{{ default_local_config | combine(host_item.value, recursive=true) }}"
+  loop_control:
+    loop_var: host_item
+  with_dict: "{{ topology.peers }}"
+  no_log: true
+  tags: [tunnels, config]

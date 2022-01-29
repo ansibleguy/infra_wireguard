@@ -1,8 +1,0 @@
----
-
-- name: Wireguard | Debian | Tunnel | Enabling & Starting tunnel service
-  ansible.builtin.systemd:
-    name: "wg-quick@{{ int_name }}.service"
-    daemon_reload: yes
-    enabled: true
-    state: started

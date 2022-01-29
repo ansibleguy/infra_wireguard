@@ -17,21 +17,34 @@ WG_HC:
       disable:
         'net.ipv4.ip_forward': 0
 
+  default_routing_table: 1000
+  default_keepalive: 25
+  log_output_lines: 10
+  wg_svc: 'wg-quick'
+
 # default config => is overwritten by provided config
 default_wg:
   topologies: {}
+  purge_orphaned_tunnels: true
   path_keys: "{{ WG_HC.path_config }}/keys"
   support:
     dns: true
     traffic_forwarding: false
   log_prefix: 'wireguard'
+  restart_on_change: false  # allow the wg-services to be restarted on changes
+  int_prefix:
+    single: 'wgS'
+    star: 'wgX'
+    mesh: 'wgM'
 
 WG_CONFIG: "{{ default_wg | combine(wireguard, recursive=true) }}"
 
 default_topology_config:
-  type: 'single'  # star/mesh
+  type: 'single'  # single/star/mesh
   peers: {}
   psk: true
+  NATed: false  # alternative switch to enable keepalive topology-wide
+  Route: false  # alternative switch to auto-add routes topology-wide
 
 default_local_config:
   peers: {}
@@ -47,11 +60,16 @@ default_local_config:
   PreDown: []
   PostDown: []
   Table: 'off'  # set to number (p.e. 1000) to enable auto-added routes => if you do so, you will most probably need to modify your peers 'AllowedIPs' or lock yourself out (;
+  Route: false  # alternative switch to auto-add routes
+  NATed: false  # alternative switch to enable keepalive
+  role: 'edge'  # center/edge
 
 default_peer_config:
   Endpoint: ''
-  EndpointPort: "{{ WG_HC.default_port }}"
+  ListenPort: "{{ WG_HC.default_port }}"
   AllowedIPs:
     - '0.0.0.0/0'
     - '::/0'
   PersistentKeepalive: 0  # set to 25 if the connection is NATed
+  NATed: false  # alternative switch to enable keepalive
+  role: 'edge'  # center/edge

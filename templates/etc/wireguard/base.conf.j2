@@ -1,0 +1,24 @@
+[Interface]
+Address = {% for ip in wg_local.Address | ensure_list %}{{ ip }}{% if not loop.last %}, {% endif %}{% endfor %}
+
+{% if wg_local.ListenPort != '' %}
+ListenPort = {{ wg_local.ListenPort }}
+{% endif %}
+PostUp = wg set %i private-key {{ privkey_file_full }}
+MTU = {{ wg_local.MTU }}
+{% if wg_local.Table not in ['', 'off', none] %}
+Table = {{ wg_local.Table }}
+{% elif wg_local.Route or topology.Route %}
+Table = {{ WG_HC.default_routing_table }}
+{% else %}
+Table = off
+{% endif %}
+{% if wg_local.DNS not in ['', ' ', none] and wg_local.DNS | length > 0 %}
+DNS = {% for dns in wg_local.DNS | ensure_list %}{{ dns }}{% if not loop.last %}, {% endif %}{% endfor %}
+
+{% endif %}
+{% for script_key in ['PreUp', 'PostUp', 'PreDown', 'PostDown'] %}
+{%   for script in wg_local[script_key] | ensure_list %}
+{{ script_key }} = {{ script }}
+{%   endfor %}
+{% endfor %}

@@ -1,0 +1,16 @@
+---
+
+- name: "Wireguard | Debian | Topology {{ topo_name }} | Star | Tunnel | Building center-config"
+  ansible.builtin.set_fact:
+    wg_star_edges: "{{ topology.peers | star_edge_peers }}"
+  tags: [tunnels, config]
+
+- name: "Wireguard | Debian | Topology {{ topo_name }} | Star | Tunnel | Configuring tunnel"
+  ansible.builtin.template:
+    src: 'templates/etc/wireguard/star.conf.j2'
+    dest: "/etc/wireguard/{{ int_name }}.conf"
+    owner: 'root'
+    group: 'root'
+    mode: 0640
+  register: wg_config
+  tags: [tunnels, config]

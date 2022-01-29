@@ -1,0 +1,47 @@
+---
+
+- name: "Wireguard | Debian | Topology {{ topo_name }} | Tunnel | Enabling & Starting tunnel service"
+  ansible.builtin.systemd:
+    name: "{{ WG_HC.wg_svc }}@{{ int_name }}.service"
+    daemon_reload: yes
+    enabled: true
+    state: started
+  register: wg_svc_start
+  ignore_errors: true
+  tags: [tunnels, config]
+
+- name: "Wireguard | Debian | Topology {{ topo_name }} | Tunnel | Restarting tunnel service"
+  ansible.builtin.systemd:
+    name: "{{ WG_HC.wg_svc }}@{{ int_name }}.service"
+    state: restarted
+  register: wg_svc_restart
+  ignore_errors: true
+  when:
+    - wg_config.changed
+    - not wg_svc_start.changed
+    - WG_CONFIG.restart_on_change
+  tags: [tunnels, config]
+
+- name: "Wireguard | Debian | Topology {{ topo_name }} | Tunnel | Getting last logs"
+  ansible.builtin.command: "journalctl -u {{ WG_HC.wg_svc }}@{{ int_name }}.service --no-pager -n {{ WG_HC.log_output_lines }}"
+  register: wg_svc_start_logs
+  changed_when: false
+  when: >
+    (wg_svc_start.failed is defined and wg_svc_start.failed) or
+    (wg_svc_restart.failed is defined and wg_svc_restart.failed)
+  tags: [tunnels, config]
+
+- name: "Wireguard | Debian | Topology {{ topo_name }} | Tunnel | Here are the last service logs"
+  ansible.builtin.debug:
+    msg: "{{ wg_svc_start_logs.stdout_lines[1:-2] }}"
+  when:
+    (wg_svc_start.failed is defined and wg_svc_start.failed) or
+    (wg_svc_restart.failed is defined and wg_svc_restart.failed)
+  tags: [tunnels, config]
+
+- name: "Wireguard | Debian | Topology {{ topo_name }} | Tunnel | Re-raise failure"
+  ansible.builtin.fail:
+    msg: "Unable to (re-)start service '{{ WG_HC.wg_svc }}@{{ int_name }}.service'"
+  when:
+    (wg_svc_start.failed is defined and wg_svc_start.failed) or
+    (wg_svc_restart.failed is defined and wg_svc_restart.failed)
