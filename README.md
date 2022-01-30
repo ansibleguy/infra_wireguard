@@ -17,11 +17,10 @@ Role to deploy WireGuard Site-to-Site VPN setups.
 * **Configuration**
   * Simplified configuration by the mapping of **topologies**
   * **Supported topologies**:
-    * **single** - simply connect two nodes
-    * **star** - one or multiple central hubs to connect branch/edge sites
-  * In progress:  (**NOT YET AVAILABLE**)
-    * Topologies (*currently testing dynamic routing*)
-       * mesh - connect each of the peers to every other one
+    * **[single](https://github.com/ansibleguy/infra_wireguard/blob/stable/ExampleSingle.md)** - simply connect two nodes
+    * **[star](https://github.com/ansibleguy/infra_wireguard/blob/stable/ExampleStar.md)** - multiple edge/branch nodes connect to one central hub
+    * In progress:  (**NOT YET AVAILABLE**)
+      * **[mesh](https://github.com/ansibleguy/infra_wireguard/blob/stable/ExampleMesh.md)** - connect each of the peers to every other one
   * **Keys**
     * Generating public/private key-pairs for each host in a topology (*WG identifies peer by publicKey*)
     * Keys are written to the controller for consistency
@@ -58,14 +57,9 @@ Role to deploy WireGuard Site-to-Site VPN setups.
 * **Warning:** Not every setting/variable you provide will be checked for validity. Bad config might break the role!
 
 
-* **Note:** The star and mesh topologies depend heavily on the way the routing is implemented.
-In those setups I would not recommend using the auto-added routes!
-Therefore, configuring static routes becomes confusing/messy very quickly.
-I'll check to get dynamic routing up-and-running before continuing with those topologies!
-
-
 * **Warning:** Be aware that the WireGuard up-/down-scripts are executed as the **TUNNEL SERVICE** goes up; **NOT THE TUNNEL CONNECTION**.
-You might need to take this in consideration when planning/configuring your routes and metrics!
+
+  You might need to take this in consideration when planning/configuring your routes and metrics!
 
 
 * **Info:** Here are some common error-messages you might see when mis-configuring your tunnels:
@@ -136,16 +130,6 @@ You might want to use 'ansible-vault' to encrypt those:
 ```bash
 ansible-vault encrypt roles/ansibleguy.infra_wireguard/files/keys/some_file.key
 ```
-
-#### Star Topology
-
-You have to mind some cases when you configure a star-topology:
-
-* The central server needs to be reachable per static IP or public DNS
-* We would not recommend using the auto-added routes on the center node! A configuration error could lock you out as the routes get added with a metric of zero!
-* There may only be one central server! If you want to configure a redundant star-topology => just use two.
-
-Basically the edge-nodes are using the 'single' config and the 'center' node has a customized config with N peers.
 
 ### Execution
 

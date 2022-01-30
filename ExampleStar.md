@@ -12,6 +12,18 @@ This was done before running this example:
 
 ## Config
 
+You have to mind some cases when you configure a star-topology:
+
+* The central server needs to be reachable per static IP or public DNS
+* We would not recommend using the auto-added routes on the center node!
+
+  A configuration error could lock you out as the routes get added with a metric of zero!
+* There may only be one central server!
+  
+  If you want to configure a redundant star-topology => just use two.
+
+Basically the edge-nodes are using the 'single' config and the 'center' node has a customized config with N peers.
+
 The prefix 'wgX_' will be prepended for interfaces of the topology 'single'.
 
 This prefix and much more can be changed as provided.
