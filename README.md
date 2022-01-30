@@ -16,12 +16,12 @@ Role to deploy WireGuard Site-to-Site VPN setups.
 
 * **Configuration**
   * Simplified configuration by the mapping of **topologies**
-  * Supported topologies:
-    * single - simply connect two nodes
+  * **Supported topologies**:
+    * **single** - simply connect two nodes
+    * **star** - one or multiple central hubs to connect branch/edge sites
   * In progress:  (**NOT YET AVAILABLE**)
     * Topologies (*currently testing dynamic routing*)
-       * star - one or multiple central hubs to connect branch/edge sites (**NOT YET AVAILABLE**)
-       * mesh - connect each of the peers to every other one (**NOT YET AVAILABLE**)
+       * mesh - connect each of the peers to every other one
   * **Keys**
     * Generating public/private key-pairs for each host in a topology (*WG identifies peer by publicKey*)
     * Keys are written to the controller for consistency
@@ -88,7 +88,7 @@ You might need to take this in consideration when planning/configuring your rout
 
 ## Setup
 
-For this role to work - you must install its dependencies first:
+For this role to work - you must install its dependencies first: (*on the controller*)
 
 ```
 pip install netaddr

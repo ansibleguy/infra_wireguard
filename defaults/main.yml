@@ -21,6 +21,7 @@ WG_HC:
   default_keepalive: 25
   log_output_lines: 10
   wg_svc: 'wg-quick'
+  controller_required_mods: ['netaddr']
 
 # default config => is overwritten by provided config
 default_wg:

@@ -14,6 +14,24 @@
   when: "inventory_hostname not in wireguard.topologies | flatten_hosts"
   tags: [purge, tunnels, config]
 
+- name: Wireguard | Installing dependencies on controller
+  ansible.builtin.pip:
+    name: "{{ WG_HC.controller_required_mods }}"
+    state: present
+  delegate_to: localhost
+  register: install_controller_requirements
+  ignore_errors: true
+  become: false
+  run_once: true
+
+- name: Wireguard | Notify User
+  ansible.builtin.pause:
+    prompt: "You need to install the python module 'netaddr' for this role to work correctly!"
+  run_once: true
+  when:
+    - install_controller_requirements.failed is defined
+    - install_controller_requirements.failed
+
 - name: Wireguard | Processing debian config
   ansible.builtin.import_tasks: debian/main.yml
   when: "ansible_distribution|lower in ['debian', 'ubuntu']"
