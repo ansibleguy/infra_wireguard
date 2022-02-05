@@ -60,7 +60,9 @@ default_local_config:
   PostUp: []
   PreDown: []
   PostDown: []
-  Table: 'off'  # set to number (p.e. 1000) to enable auto-added routes => if you do so, you will most probably need to modify your peers 'AllowedIPs' or lock yourself out (;
+  Table: 'off'
+  # set to number (p.e. 1000) to enable auto-added routes
+  # if you do so, you will most probably need to modify your peers 'AllowedIPs' or lock yourself out (;
   Route: false  # alternative switch to auto-add routes
   NATed: false  # alternative switch to enable keepalive
   role: 'edge'  # center/edge
