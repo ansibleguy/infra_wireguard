@@ -1,0 +1,175 @@
+---
+
+references:
+  docker:
+    all: &docker_all
+      docker_host: 'tcp://172.16.111.91:2375'
+      # docker_host: 'unix://var/run/docker.sock'  # localhost
+      purge_networks: true
+      image: 'debian:11-slim'
+      dockerfile: 'Dockerfile.j2'
+      build_image: yes
+      tmpfs: ['/tmp', '/run', '/run/lock']
+      privileged: true
+      command: '/sbin/init'
+      # for docker systemd config see: https://serverfault.com/questions/1053187/systemd-fails-to-run-in-a-docker-container-when-using-cgroupv2-cgroupns-priva
+
+    nw:
+      s: &docker_nw_s 'test-ag-wg-s-net'
+      x: &docker_nw_x 'test-ag-wg-x-net'
+      m: &docker_nw_m 'test-ag-wg-m-net'
+      i: &docker_nw_i 'test-ag-wg-internal-net'
+
+dependency:
+  name: galaxy
+driver:
+  name: docker
+platforms:
+  # single 1
+  - name: test-ag-wg-s1
+    # docker networks need to be defined initially
+    docker_networks:
+      - name: *docker_nw_s
+        ipam_config:
+          - subnet: '192.168.1.0/24'
+            gateway: '192.168.1.254'
+      - name: *docker_nw_x
+        ipam_config:
+          - subnet: '192.168.2.0/24'
+            gateway: '192.168.2.254'
+      - name: *docker_nw_m
+        ipam_config:
+          - subnet: '192.168.3.0/24'
+            gateway: '192.168.3.254'
+      - name: *docker_nw_i
+        ipam_config:
+          - subnet: '172.30.0.0/18'
+            gateway: '172.30.63.254'
+    networks:
+      - name: *docker_nw_s
+        ipv4_address: '192.168.1.1'
+      - name: *docker_nw_i
+        ipv4_address: '172.30.11.1'
+    <<: *docker_all
+  - name: test-ag-wg-s2
+    networks:
+      - name: *docker_nw_s
+        ipv4_address: '192.168.1.2'
+      - name: *docker_nw_i
+        ipv4_address: '172.30.12.1'
+    <<: *docker_all
+  # single 2
+  - name: test-ag-wg-s3
+    networks:
+      - name: *docker_nw_s
+        ipv4_address: '192.168.1.3'
+      - name: *docker_nw_i
+        ipv4_address: '172.30.13.1'
+    <<: *docker_all
+  - name: test-ag-wg-s4
+    networks:
+      - name: *docker_nw_s
+        ipv4_address: '192.168.1.4'
+      - name: *docker_nw_i
+        ipv4_address: '172.30.14.1'
+    <<: *docker_all
+  # single 3
+  - name: test-ag-wg-s5
+    networks:
+      - name: *docker_nw_s
+        ipv4_address: '192.168.1.5'
+      - name: *docker_nw_i
+        ipv4_address: '172.30.15.1'
+    <<: *docker_all
+  - name: test-ag-wg-s6
+    networks:
+      - name: *docker_nw_s
+        ipv4_address: '192.168.1.6'
+      - name: *docker_nw_i
+        ipv4_address: '172.30.16.1'
+    <<: *docker_all
+  # star 1
+  - name: test-ag-wg-x1
+    networks:
+      - name: *docker_nw_x
+        ipv4_address: '192.168.2.1'
+      - name: *docker_nw_i
+        ipv4_address: '172.30.21.1'
+    <<: *docker_all
+  - name: test-ag-wg-x2
+    networks:
+      - name: *docker_nw_x
+        ipv4_address: '192.168.2.2'
+      - name: *docker_nw_i
+        ipv4_address: '172.30.22.1'
+    <<: *docker_all
+  - name: test-ag-wg-x3
+    networks:
+      - name: *docker_nw_x
+        ipv4_address: '192.168.2.3'
+      - name: *docker_nw_i
+        ipv4_address: '172.30.23.1'
+    <<: *docker_all
+  - name: test-ag-wg-x4
+    networks:
+      - name: *docker_nw_x
+        ipv4_address: '192.168.2.4'
+      - name: *docker_nw_i
+        ipv4_address: '172.30.24.1'
+    <<: *docker_all
+  # star 2-3 (redundant)
+  - name: test-ag-wg-x5
+    networks:
+      - name: *docker_nw_x
+        ipv4_address: '192.168.2.5'
+      - name: *docker_nw_i
+        ipv4_address: '172.30.25.1'
+    <<: *docker_all
+  - name: test-ag-wg-x6
+    networks:
+      - name: *docker_nw_x
+        ipv4_address: '192.168.2.6'
+      - name: *docker_nw_i
+        ipv4_address: '172.30.26.1'
+    <<: *docker_all
+  - name: test-ag-wg-x7
+    networks:
+      - name: *docker_nw_x
+        ipv4_address: '192.168.2.7'
+      - name: *docker_nw_i
+        ipv4_address: '172.30.27.1'
+    <<: *docker_all
+  - name: test-ag-wg-x8
+    networks:
+      - name: *docker_nw_x
+        ipv4_address: '192.168.2.8'
+      - name: *docker_nw_i
+        ipv4_address: '172.30.28.1'
+    <<: *docker_all
+  # mesh
+  - name: test-ag-wg-m1
+    networks:
+      - name: *docker_nw_m
+        ipv4_address: '192.168.3.1'
+      - name: *docker_nw_i
+        ipv4_address: '172.30.31.1'
+    <<: *docker_all
+  - name: test-ag-wg-m2
+    networks:
+      - name: *docker_nw_m
+        ipv4_address: '192.168.3.2'
+      - name: *docker_nw_i
+        ipv4_address: '172.30.32.1'
+    <<: *docker_all
+  - name: test-ag-wg-m3
+    networks:
+      - name: *docker_nw_m
+        ipv4_address: '192.168.3.3'
+      - name: *docker_nw_i
+        ipv4_address: '172.30.33.1'
+    <<: *docker_all
+
+provisioner:
+  name: ansible
+verifier:
+  name: ansible

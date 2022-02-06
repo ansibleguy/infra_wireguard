@@ -1,0 +1,15 @@
+# docker build -t mantest - < ./Dockerfile.j2
+# docker run -it --privileged --name mantest mantest:latest /sbin/init --tmpfs /tmp --tmpfs /run --tmpfs /run/lock
+
+FROM debian:11-slim
+
+ENV container docker
+ENV LC_ALL C
+ENV DEBIAN_FRONTEND noninteractive
+
+RUN apt-get update \
+    && apt-get install -y systemd systemd-sysv python3 sudo iputils-ping procps net-tools \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+CMD ["/sbin/init"]

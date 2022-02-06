@@ -1,0 +1,229 @@
+---
+
+- name: Converge
+  hosts: all
+  vars:
+    # here we actually configure the WireGuard topologies
+    sites:
+      # single 1
+      s1:
+        ip: '192.168.1.1'
+        nw: '172.16.11.0/24'
+        wgip: '10.0.1.1/30'
+      s2:
+        ip: '192.168.1.2'
+        nw: '172.16.12.0/24'
+        wgip: '10.0.1.2/30'
+      # single 2
+      s3:
+        ip: '192.168.1.3'
+        nw: '172.16.13.0/24'
+        wgip: '10.0.1.1/30'
+      s4:
+        ip: '192.168.1.4'
+        nw: '172.16.14.0/24'
+        wgip: '10.0.1.2/30'
+      # single 3
+      s5:
+        ip: '192.168.1.5'
+        nw: '172.16.15.0/24'
+        wgip: '10.0.1.1/30'
+      s6:
+        ip: '192.168.1.6'
+        nw: '172.16.16.0/24'
+        wgip: '10.0.1.2/30'
+      # star 1
+      x1:  # center
+        ip: '192.168.2.1'
+        nw: '172.16.21.0/24'
+        wgip: '10.0.2.1'
+        super: '172.16.0.0/16'
+      x2:
+        ip: '192.168.2.2'
+        nw: '172.16.22.0/24'
+        wgip: '10.0.2.2'
+      x3:
+        ip: '192.168.2.3'
+        nw: '172.16.23.0/24'
+        wgip: '10.0.2.3'
+      x4:
+        ip: '192.168.2.4'
+        nw: '172.16.24.0/24'
+        wgip: '10.0.2.4'
+      # star 2-3 (redundant)
+      x5:  # center 1
+        ip: '192.168.2.5'
+        nw: '172.16.25.0/24'
+        wgip1: '10.0.3.1'
+        wgip2: '10.0.3.131'
+        metric: 100
+        super: '172.16.0.0/16'
+      x6:  # center 2
+        ip: '192.168.2.6'
+        nw: '172.16.26.0/24'
+        wgip1: '10.0.3.2'
+        wgip2: '10.0.3.132'
+        metric: 110
+        super: '172.16.0.0/16'
+      x7:
+        ip: '192.168.2.7'
+        nw: '172.16.27.0/24'
+        wgip1: '10.0.3.3'
+        wgip2: '10.0.3.133'
+      x8:
+        ip: '192.168.2.8'
+        nw: '172.16.28.0/24'
+        wgip1: '10.0.3.4'
+        wgip2: '10.0.3.134'
+      # mesh
+      m1:
+        ip: '192.168.3.1'
+        nw: '172.16.31.0/24'
+        wgip: '10.0.3.1'
+      m2:
+        ip: '192.168.3.2'
+        nw: '172.16.32.0/24'
+        wgip: '10.0.3.2'
+      m3:
+        ip: '192.168.3.3'
+        nw: '172.16.33.0/24'
+        wgip: '10.0.3.3'
+    tops:
+      tx1:
+        wgsn: '24'
+      tx2:
+        wgsn: '25'
+      tm1:
+        wgsn: '24'
+
+    wireguard:
+      continuous_installs: 10  # else docker may have a hard time
+      topologies:
+        ts1:
+          type: 'single'
+          peers:
+            test-ag-wg-s1:
+              Endpoint: "{{ sites.s1.ip }}"
+              Address: "{{ sites.s1.wgip }}"
+              PostUp: "ip route add {{ sites.s2.nw }} dev %i metric 100"
+            test-ag-wg-s2:
+              Endpoint: "{{ sites.s2.ip }}"
+              Address: "{{ sites.s2.wgip }}"
+              PostUp: "ip route add {{ sites.s1.nw }} dev %i metric 100"
+        ts2:
+          type: 'single'
+          Route: true
+          peers:
+            test-ag-wg-s3:
+              Endpoint: "{{ sites.s3.ip }}"
+              Address: "{{ sites.s3.wgip }}"
+              AllowedIPs: "{{ sites.s3.nw }}"
+            test-ag-wg-s4:
+              Endpoint: "{{ sites.s4.ip }}"
+              Address: "{{ sites.s4.wgip }}"
+              AllowedIPs: "{{ sites.s4.nw }}"
+        ts3:
+          type: 'single'
+          NATed: true
+          peers:
+            test-ag-wg-s5:
+              Endpoint: "{{ sites.s5.ip }}"
+              Address: "{{ sites.s5.wgip }}"
+              PostUp: "ip route add {{ sites.s6.nw }} dev %i metric 100"
+            test-ag-wg-s6:
+              Endpoint: "{{ sites.s6.ip }}"
+              Address: "{{ sites.s6.wgip }}"
+              PostUp: "ip route add {{ sites.s5.nw }} dev %i metric 100"
+        tx1:
+          type: 'star'
+          peers:
+            test-ag-wg-x1:
+              role: 'center'
+              Endpoint: "{{ sites.x1.ip }}"
+              Address: "{{ sites.x1.wgip }}/{{ tops.tx1.wgsn }}"
+              AllowedIPs: "{{ sites.x1.super }}"
+              PostUp:
+                - "ip route add {{ sites.x2.nw }} dev %i metric 100 via {{ sites.x2.wgip }}"
+                - "ip route add {{ sites.x3.nw }} dev %i metric 100 via {{ sites.x3.wgip }}"
+                - "ip route add {{ sites.x4.nw }} dev %i metric 100 via {{ sites.x4.wgip }}"
+            test-ag-wg-x2:
+              Endpoint: "{{ sites.x2.ip }}"
+              Address: "{{ sites.x2.wgip }}/{{ tops.tx1.wgsn }}"
+              PostUp: "ip route add {{ sites.x1.super }} dev %i metric 100 via {{ sites.x1.wgip }}"
+            test-ag-wg-x3:
+              Endpoint: "{{ sites.x3.ip }}"
+              Address: "{{ sites.x3.wgip }}/{{ tops.tx1.wgsn }}"
+              Route: true
+            test-ag-wg-x4:
+              Address: "{{ sites.x4.wgip }}/{{ tops.tx1.wgsn }}"
+              Route: true
+              NATed: true
+        tx2:
+          type: 'star'
+          peers:
+            test-ag-wg-x5:
+              role: 'center'
+              Endpoint: "{{ sites.x5.ip }}"
+              Address: "{{ sites.x5.wgip1 }}/{{ tops.tx2.wgsn }}"
+              AllowedIPs: "{{ sites.x5.super }}"
+              PostUp:
+                - "ip route add {{ sites.x6.nw }} dev %i metric {{ sites.x5.metric }} via {{ sites.x6.wgip1 }}"
+                - "ip route add {{ sites.x7.nw }} dev %i metric {{ sites.x5.metric }} via {{ sites.x7.wgip1 }}"
+                - "ip route add {{ sites.x8.nw }} dev %i metric {{ sites.x5.metric }} via {{ sites.x8.wgip1 }}"
+            test-ag-wg-x6:
+              Endpoint: "{{ sites.x6.ip }}"
+              Address: "{{ sites.x6.wgip1 }}/{{ tops.tx2.wgsn }}"
+              PostUp: "ip route add {{ sites.x5.super }} dev %i metric {{ sites.x5.metric }} via {{ sites.x5.wgip1 }}"
+            test-ag-wg-x7:
+              Endpoint: "{{ sites.x7.ip }}"
+              Address: "{{ sites.x7.wgip1 }}/{{ tops.tx2.wgsn }}"
+              PostUp: "ip route add {{ sites.x5.super }} dev %i metric {{ sites.x5.metric }} via {{ sites.x5.wgip1 }}"
+            test-ag-wg-x8:
+              Address: "{{ sites.x8.wgip1 }}/{{ tops.tx2.wgsn }}"
+              NATed: true
+              PostUp: "ip route add {{ sites.x5.super }} dev %i metric {{ sites.x5.metric }} via {{ sites.x5.wgip1 }}"
+        tx3:
+          type: 'star'
+          peers:
+            test-ag-wg-x5:
+              Endpoint: "{{ sites.x5.ip }}"
+              Address: "{{ sites.x5.wgip2 }}/{{ tops.tx2.wgsn }}"
+              PostUp: "ip route add {{ sites.x6.super }} dev %i metric {{ sites.x6.metric }} via {{ sites.x6.wgip2 }}"
+            test-ag-wg-x6:
+              role: 'center'
+              Endpoint: "{{ sites.x6.ip }}"
+              Address: "{{ sites.x6.wgip2 }}/{{ tops.tx2.wgsn }}"
+              AllowedIPs: "{{ sites.x6.super }}"
+              PostUp:
+                - "ip route add {{ sites.x5.nw }} dev %i metric {{ sites.x6.metric }} via {{ sites.x5.wgip2 }}"
+                - "ip route add {{ sites.x7.nw }} dev %i metric {{ sites.x6.metric }} via {{ sites.x7.wgip2 }}"
+                - "ip route add {{ sites.x8.nw }} dev %i metric {{ sites.x6.metric }} via {{ sites.x8.wgip2 }}"
+            test-ag-wg-x7:
+              Endpoint: "{{ sites.x7.ip }}"
+              Address: "{{ sites.x7.wgip2 }}/{{ tops.tx2.wgsn }}"
+              PostUp: "ip route add {{ sites.x6.super }} dev %i metric {{ sites.x6.metric }} via {{ sites.x6.wgip2 }}"
+            test-ag-wg-x8:
+              Address: "{{ sites.x8.wgip2 }}/{{ tops.tx2.wgsn }}"
+              NATed: true
+              PostUp: "ip route add {{ sites.x6.super }} dev %i metric {{ sites.x6.metric }} via {{ sites.x6.wgip2 }}"
+        tm1:
+          type: 'mesh'
+          Route: true
+          peers:
+            test-ag-wg-m1:
+              Endpoint: "{{ sites.m1.ip }}"
+              Address: "{{ sites.m1.wgip }}/{{ tops.tm1.wgsn }}"
+              AllowedIPs: "{{ sites.m1.nw }}"
+            test-ag-wg-m2:
+              Endpoint: "{{ sites.m2.ip }}"
+              Address: "{{ sites.m2.wgip }}/{{ tops.tm1.wgsn }}"
+              AllowedIPs: "{{ sites.m2.nw }}"
+              ListenPort: 51821
+            test-ag-wg-m3:
+              NATed: true
+              Address: "{{ sites.m3.wgip }}/{{ tops.tm1.wgsn }}"
+              AllowedIPs: "{{ sites.m3.nw }}"
+              ListenPort: 51822
+
+  roles:
+    - ansibleguy.infra_wireguard

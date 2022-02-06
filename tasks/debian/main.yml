@@ -1,13 +1,34 @@
 ---
 
-- name: Wireguard | Debian | Installing WireGuard
+- name: Wireguard | Debian | Installing WireGuard (can take some time)
   ansible.builtin.apt:
-    pkg: ['wireguard']
+    pkg: "{{ WG_HC.packages }}"
+    state: present
   tags: [base]
+  throttle: "{{ WG_CONFIG.continuous_installs }}"
+
+- name: Wireguard | Debian | Preparing DNS-Util for docker container (1/2)
+  ansible.builtin.apt:
+    name: ['debconf-utils']
+    state: present
+  when:
+    - ansible_virtualization_role is defined
+    - ansible_virtualization_role == 'guest'
+    - "'docker' in ansible_virtualization_tech_guest"
+
+- name: Wireguard | Debian | Preparing DNS-Util for docker container (2/2)
+  ansible.builtin.command:
+    cmd: 'debconf-set-selections'
+    stdin: 'resolvconf resolvconf/linkify-resolvconf boolean false'
+  when:
+    - ansible_virtualization_role is defined
+    - ansible_virtualization_role == 'guest'
+    - "'docker' in ansible_virtualization_tech_guest"
 
 - name: Wireguard | Debian | Installing WireGuard DNS-Util
   ansible.builtin.apt:
     pkg: ['resolvconf']
+    state: present
   register: wg_resolvconf_setup
   when: WG_CONFIG.support.dns
   tags: [base]
