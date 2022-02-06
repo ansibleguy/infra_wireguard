@@ -1,12 +1,10 @@
 ---
 
 - name: Wireguard | Checking config
-  ansible.builtin.fail:
-    msg: "The required configuration was not provided!
-    Needed: 'wireguard', 'wireguard.topologies'"
-  when: >
-    wireguard is undefined or
-    wireguard.topologies is undefined
+  ansible.builtin.assert:
+    that:
+      - wireguard is defined
+      - wireguard.topologies is defined
   tags: [purge, tunnels, config]
 
 - name: Wireguard | Skipping host => not configured in any wireguard-topology

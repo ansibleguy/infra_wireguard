@@ -14,12 +14,8 @@ class FilterModule(object):
         }
 
     @staticmethod
-    def safe_linux_interface_name(key: str) -> str:
+    def safe_int_name(key: str) -> str:
         return regex_replace('[^a-zA-Z0-9_=+.-]', '', key.replace(' ', '_'))[:15]
-
-    @classmethod
-    def safe_int_name(cls, key: str) -> str:
-        return cls.safe_linux_interface_name(key)
 
     @staticmethod
     def flatten_hosts(topologies: dict) -> list:
@@ -70,6 +66,10 @@ class FilterModule(object):
                 edges[k] = v
 
         return edges
+
+    @staticmethod
+    def mesh_peers(all_peers: dict, this_host: str) -> dict:
+        return {k: v for k, v in all_peers.items() if k != this_host}
 
     # @staticmethod
     # def get_ip_by_id(nw_cidr: str, nw_id: int, gw_range: int, gw: bool = False) -> str:
