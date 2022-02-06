@@ -189,6 +189,7 @@
               Endpoint: "{{ sites.x5.ip }}"
               Address: "{{ sites.x5.wgip2 }}/{{ tops.tx2.wgsn }}"
               PostUp: "ip route add {{ sites.x6.super }} dev %i metric {{ sites.x6.metric }} via {{ sites.x6.wgip2 }}"
+              ListenPort: 51821
             test-ag-wg-x6:
               role: 'center'
               Endpoint: "{{ sites.x6.ip }}"
@@ -198,14 +199,17 @@
                 - "ip route add {{ sites.x5.nw }} dev %i metric {{ sites.x6.metric }} via {{ sites.x5.wgip2 }}"
                 - "ip route add {{ sites.x7.nw }} dev %i metric {{ sites.x6.metric }} via {{ sites.x7.wgip2 }}"
                 - "ip route add {{ sites.x8.nw }} dev %i metric {{ sites.x6.metric }} via {{ sites.x8.wgip2 }}"
+              ListenPort: 51821
             test-ag-wg-x7:
               Endpoint: "{{ sites.x7.ip }}"
               Address: "{{ sites.x7.wgip2 }}/{{ tops.tx2.wgsn }}"
               PostUp: "ip route add {{ sites.x6.super }} dev %i metric {{ sites.x6.metric }} via {{ sites.x6.wgip2 }}"
+              ListenPort: 51821
             test-ag-wg-x8:
               Address: "{{ sites.x8.wgip2 }}/{{ tops.tx2.wgsn }}"
               NATed: true
               PostUp: "ip route add {{ sites.x6.super }} dev %i metric {{ sites.x6.metric }} via {{ sites.x6.wgip2 }}"
+              ListenPort: 51821
         tm1:
           type: 'mesh'
           Route: true
@@ -218,12 +222,10 @@
               Endpoint: "{{ sites.m2.ip }}"
               Address: "{{ sites.m2.wgip }}/{{ tops.tm1.wgsn }}"
               AllowedIPs: "{{ sites.m2.nw }}"
-              ListenPort: 51821
             test-ag-wg-m3:
               NATed: true
               Address: "{{ sites.m3.wgip }}/{{ tops.tm1.wgsn }}"
               AllowedIPs: "{{ sites.m3.nw }}"
-              ListenPort: 51822
 
   roles:
     - ansibleguy.infra_wireguard
