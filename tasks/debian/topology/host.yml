@@ -28,3 +28,11 @@
     int_name: "{{ WG_CONFIG.int_prefix.star + '_' + topo_name | safe_int_name }}"
   when: topology.type == 'star'
   tags: [tunnels, config]
+
+- name: "Wireguard | Debian | Topology {{ topo_name }} | Host | Configuring tunnel for topology 'star'"
+  ansible.builtin.include_tasks: tunnel/mesh.yml
+  vars:
+    privkey_file_full: "{{ WG_CONFIG.path_keys }}/{{ topo_name }}_{{ host }}.{{ WG_HC.ext.key }}"
+    int_name: "{{ WG_CONFIG.int_prefix.mesh + '_' + topo_name | safe_int_name }}"
+  when: topology.type == 'mesh'
+  tags: [tunnels, config]

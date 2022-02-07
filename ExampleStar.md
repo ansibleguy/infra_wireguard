@@ -9,7 +9,6 @@ This was done before running this example:
 * Network-interfaces and -capabilities => using [THIS](https://github.com/ansibleguy/linux_networking) role
 * Allowing traffic for the used ports => using [THIS](https://github.com/ansibleguy/linux_ufw) role
 
-
 ## Config
 
 You have to mind some cases when you configure a star-topology:
@@ -18,13 +17,18 @@ You have to mind some cases when you configure a star-topology:
 * We would not recommend using the auto-added routes on the center node!
 
   A configuration error could lock you out as the routes get added with a metric of zero!
+
+  Also: the build-in auto-added routes will not work for this kind of connection as the gateway is not set.
+
 * There may only be one central server!
   
   If you want to configure a redundant star-topology => just use two.
 
+* Don't forget to allowed forwarded traffic using iptables or ufw!
+
 Basically the edge-nodes are using the 'single' config and the 'center' node has a customized config with N peers.
 
-The prefix 'wgX_' will be prepended for interfaces of the topology 'single'.
+The prefix 'wgX_' will be prepended for interfaces of the topology 'star'.
 
 This prefix and much more can be changed as provided.
 
@@ -44,6 +48,9 @@ site_networks:
 
 # vpn config
 wireguard:
+  support:
+    traffic_forwarding: true
+
   topologies:
     dc_nl:
       type: 'star'
@@ -52,7 +59,7 @@ wireguard:
           role: 'center'
           Endpoint: 'srv03.wg.template.ansibleguy.net'
           Address: "{{ site_networks.nl.ip }}/24"
-          AllowedIPs: ["{{ site_networks.super }}"]
+          AllowedIPs: "{{ site_networks.super }}"  # can be list or single element
           PostUp:
             - "ip route add {{ site_networks.de.net }} metric 100 dev %i via {{ site_networks.de.ip }}"
             - "ip route add {{ site_networks.at.net }} metric 100 dev %i via {{ site_networks.at.ip }}"
@@ -61,14 +68,14 @@ wireguard:
           Endpoint: 'srv04.wg.template.ansibleguy.net'
           Address: "{{ site_networks.de.ip }}/24"
           Route: true  # auto-add routes to peer 'AllowedIPs'
-          AllowedIPs: ["{{ site_networks.de.net }}"]
+          AllowedIPs: "{{ site_networks.de.net }}"
 
         srv07:  # srv07 is behind a firewall
           Address: "{{ site_networks.at.ip }}/24"
           ListenPort: ''  # does not need to listen on any port
           Route: true
           NATed: true
-          AllowedIPs: ["{{ site_networks.at.net }}"]
+          AllowedIPs: "{{ site_networks.at.net }}"
 ```
 
 ## Result
@@ -116,7 +123,7 @@ guy@srv03:~# wg show all
 >   latest handshake: 7 minutes, 26 seconds ago
 >   transfer: 596 B received, 476 B sent
 
-guy@srv03:~# systemctl status wg-quick@wgX_dc_nl.service
+guy@srv03:~# systemctl status wg-quick@*
 > ● wg-quick@wgX_dc_nl.service - WireGuard via wg-quick(8) for wgX_dc_nl
 >      Loaded: loaded (/lib/systemd/system/wg-quick@.service; disabled; vendor preset: enabled)
 >     Drop-In: /etc/systemd/system/wg-quick@.service.d

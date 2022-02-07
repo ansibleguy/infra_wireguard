@@ -1,13 +1,18 @@
 # {{ ansible_managed }}
 # ansibleguy.infra_wireguard
 
-# topology: star
-# role: center
+# topology: {{ topology.type }}
+{% if topology.type == 'star' %}
+# role: {{ wg_local.role }}
+{% endif %}
 
 {% include "base.conf.j2" %}
+{% if topology.type == 'mesh' and (wg_local.Route or topology.Route) %}
+{% include "mesh.conf.j2" %}
+{% endif %}
 
-{% for peer_name, raw_peer in wg_star_edges.items() %}
-{% set wg_peer = default_peer_config | combine(raw_peer, recursive=true) %}
+{% for peer_name, raw_peer in wg_peers.items() %}
+{%   set wg_peer = default_peer_config | combine(raw_peer, recursive=true) %}
 [Peer]
 # {{ peer_name }}
 PublicKey = {{ lookup('file', role_path + '/files/keys/' + topo_name + '_' + peer_name + '.' + WG_HC.ext.pub) }}

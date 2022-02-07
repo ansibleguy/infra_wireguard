@@ -16,7 +16,7 @@
     enabled: false
     state: stopped
     daemon_reload: yes
-  when: "loaded_svc | replace(WG_HC.wg_svc + '@','') | replace('.service','') not in wg_wanted_ints"
+  when: "loaded_svc.split('@')[1].split('.service')[0] not in wg_wanted_ints"
   register: wg_svc_removal
   ignore_errors: true
   loop_control:

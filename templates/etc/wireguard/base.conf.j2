@@ -6,7 +6,10 @@ ListenPort = {{ wg_local.ListenPort }}
 {% endif %}
 PostUp = wg set %i private-key {{ privkey_file_full }}
 MTU = {{ wg_local.MTU }}
-{% if wg_local.Table not in ['', 'off', none] %}
+{% if topology.type == 'mesh' %}
+{# mesh does not work with those routes (gateway needed) #}
+Table = off
+{% elif wg_local.Table not in ['', 'off', none] %}
 Table = {{ wg_local.Table }}
 {% elif wg_local.Route or topology.Route %}
 Table = {{ WG_HC.default_routing_table }}

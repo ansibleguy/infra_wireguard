@@ -19,8 +19,7 @@ Role to deploy WireGuard Site-to-Site VPN setups.
   * **Supported topologies**:
     * **[single](https://github.com/ansibleguy/infra_wireguard/blob/stable/ExampleSingle.md)** - simply connect two nodes
     * **[star](https://github.com/ansibleguy/infra_wireguard/blob/stable/ExampleStar.md)** - multiple edge/branch nodes connect to one central hub
-    * In progress:  (**NOT YET AVAILABLE**)
-      * **[mesh](https://github.com/ansibleguy/infra_wireguard/blob/stable/ExampleMesh.md)** - connect each of the peers to every other one
+    * **[mesh](https://github.com/ansibleguy/infra_wireguard/blob/stable/ExampleMesh.md)** - connect each of the peers to every other one
   * **Keys**
     * Generating public/private key-pairs for each host in a topology (*WG identifies peer by publicKey*)
     * Keys are written to the controller for consistency
@@ -78,6 +77,9 @@ Role to deploy WireGuard Site-to-Site VPN setups.
   * single => wgS_
   * star => wgX_
   * mesh => wgM_
+  
+
+* **Info:** How to run tests is described [here](https://github.com/ansibleguy/infra_wireguard/blob/stable/molecule/default/Testing.md)
 
 
 ## Setup

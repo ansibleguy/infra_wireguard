@@ -11,6 +11,7 @@ class FilterModule(object):
             "flatten_ints": self.flatten_ints,
             "one_center": self.one_center,
             "star_edge_peers": self.star_edge_peers,
+            "mesh_peers": self.mesh_peers,
         }
 
     @staticmethod
@@ -33,11 +34,12 @@ class FilterModule(object):
 
         for k, v in topologies.items():
             if current_host in v['peers'].keys():
-                if 'type' in v and v['type'] == 'mesh':
-                    ints.extend([cls.safe_int_name(f"{int_prefixes['mesh']}_{k}{peer}") for peer in v['peers'].keys()])
+                if 'type' in v:
+                    try:
+                        ints.append(cls.safe_int_name(f"{int_prefixes[v['type']]}_{k}"))
 
-                elif 'type' in v and v['type'] == 'star':
-                    ints.append(cls.safe_int_name(f"{int_prefixes['star']}_{k}"))
+                    except KeyError:
+                        ints.append(cls.safe_int_name(f"{int_prefixes['single']}_{k}"))
 
                 else:
                     ints.append(cls.safe_int_name(f"{int_prefixes['single']}_{k}"))
@@ -70,22 +72,6 @@ class FilterModule(object):
     @staticmethod
     def mesh_peers(all_peers: dict, this_host: str) -> dict:
         return {k: v for k, v in all_peers.items() if k != this_host}
-
-    # @staticmethod
-    # def get_ip_by_id(nw_cidr: str, nw_id: int, gw_range: int, gw: bool = False) -> str:
-    #     # pulls the Nth ip of the configured network(-range)
-    #     network = IPNetwork(nw_cidr)
-    #     ip_range = [ip for ip in network.iter_hosts()]
-    #     if gw:
-    #         for i in range(gw_range):
-    #             # the first N ips will always be used for the center point/gateway
-    #             ip_range.pop(0)
-    #
-    #     if nw_id > len(ip_range):
-    #         raise ValueError(f"Cannot use a network-id '{nw_id}' that is out of range for the configured network '{nw_cidr}'!"
-    #                          f"Available ids: 1-{len(ip_range)}")
-    #
-    #     return str(ip_range[nw_id])
 
     @staticmethod
     def ensure_list(data: (str, list)) -> list:

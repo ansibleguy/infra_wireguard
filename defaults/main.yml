@@ -20,6 +20,7 @@ WG_HC:
   packages: ['systemd', 'iproute2', 'wireguard']
 
   default_routing_table: 1000
+  default_routing_metric: 100
   default_keepalive: 25
   log_output_lines: 10
   wg_svc: 'wg-quick'
