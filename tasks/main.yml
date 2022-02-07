@@ -22,10 +22,9 @@
   become: false
   run_once: true
 
-- name: Wireguard | Notify User
-  ansible.builtin.pause:
-    prompt: "You need to install the python module 'netaddr' for this role to work correctly!"
-  run_once: true
+- name: Wireguard | Missing dependency
+  ansible.builtin.fail:
+    msg: "You need to install the python module 'netaddr' for this role to work correctly!"
   when:
     - install_controller_requirements.failed is defined
     - install_controller_requirements.failed

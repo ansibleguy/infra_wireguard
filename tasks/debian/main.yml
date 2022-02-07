@@ -4,6 +4,7 @@
   ansible.builtin.apt:
     pkg: "{{ WG_HC.packages }}"
     state: present
+    update_cache: yes
   tags: [base]
   throttle: "{{ WG_CONFIG.continuous_installs }}"
 
@@ -20,6 +21,7 @@
   ansible.builtin.command:
     cmd: 'debconf-set-selections'
     stdin: 'resolvconf resolvconf/linkify-resolvconf boolean false'
+  changed_when: false
   when:
     - ansible_virtualization_role is defined
     - ansible_virtualization_role == 'guest'
@@ -62,7 +64,7 @@
     state: present
     reload: yes
   with_dict: "{{ WG_HC.sysctl.forwarding.disable }}"
-  when: WG_CONFIG.support.traffic_forwarding
+  when: not WG_CONFIG.support.traffic_forwarding
   tags: [base]
 
 - name: Wireguard | Debian | Creating directories

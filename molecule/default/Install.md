@@ -34,6 +34,16 @@ sudo apt-get update
 
 ### Configure
 
+Either way - the docker server must have the following setting configured in '/etc/docker/daemon.json':
+
+```bash
+{"cgroup-parent": "docker.slice"}
+```
+
+Restart docker after adding that setting. This allows systemd to work inside the container without mapping cgroup manually.
+
+For further information see: [serverfault.com](https://serverfault.com/questions/1053187/systemd-fails-to-run-in-a-docker-container-when-using-cgroupv2-cgroupns-priva)
+
 #### Locally
 
 This is NOT RECOMMENDED.

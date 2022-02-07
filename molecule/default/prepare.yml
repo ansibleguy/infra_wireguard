@@ -1,0 +1,39 @@
+---
+
+- name: Wait
+  hosts: localhost
+  tasks:
+    - name: Waiting some seconds else it might kill one of the instances
+      ansible.builtin.pause:
+        seconds: 5
+      delegate_to: localhost
+
+- name: Prepare
+  hosts: all
+  strategy: free  # speed-up
+  gather_facts: no
+  tasks:
+    - name: Installing dependencies
+      ansible.builtin.apt:
+        pkg: ['iputils-ping', 'ufw', 'iproute2']
+        state: present
+        update_cache: yes
+
+    - name: Installing troubleshooting tools
+      ansible.builtin.apt:
+        pkg: ['procps', 'net-tools', 'traceroute', 'vim', 'nano', 'tcpdump']
+        state: present
+
+    - name: Allowing traffic by ufw
+      ansible.builtin.lineinfile:
+        state: present
+        path: '/etc/default/ufw'
+        regexp: "{{ item.0 }}"
+        line: "{{ item.1 }}"
+      loop:
+        - {0: 'DEFAULT_FORWARD_POLICY="DROP"', 1: 'DEFAULT_FORWARD_POLICY="ACCEPT"'}
+        - {0: 'DEFAULT_INPUT_POLICY="DROP"', 1: 'DEFAULT_INPUT_POLICY="ACCEPT"'}
+
+    - name: Enabling ufw
+      community.general.ufw:
+        state: enabled

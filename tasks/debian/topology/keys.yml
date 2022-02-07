@@ -1,5 +1,9 @@
 ---
 
+# todo: fix race condition => pk and pub might be written by different hosts and not match
+#   maybe let every host generate its own key
+#   that would need implementation of key-existence checks/catching
+
 - ansible.builtin.set_fact:
     pubkey_file: "{{ topo_name }}_{{ host }}.{{ WG_HC.ext.pub }}"
     privkey_file: "{{ topo_name }}_{{ host }}.{{ WG_HC.ext.key }}"
@@ -33,11 +37,13 @@
     content: "{{ wg_key_gen.stdout }}"
     dest: "{{ role_path }}/files/keys/{{ privkey_file }}"
     mode: 0640
+    force: no
   delegate_to: localhost
   become: false
   when: not wg_key_file.stat.exists
   no_log: true
   tags: [tunnels, config]
+  throttle: 1
 
 - name: "Wireguard | Debian | Topology {{ topo_name }} | {{ host }} keys | Generating missing public-key"
   ansible.builtin.command: 'wg pubkey'
@@ -53,8 +59,10 @@
     content: "{{ wg_pub_gen.stdout }}"
     dest: "{{ role_path }}/files/keys/{{ pubkey_file }}"
     mode: 0644
+    force: no
   delegate_to: localhost
   become: false
   when: not wg_key_file.stat.exists
   no_log: true
   tags: [tunnels, config]
+  throttle: 1
