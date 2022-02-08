@@ -10,7 +10,7 @@ This was done before running this example:
 
 ## Config
 
-The prefix 'wgS_' will be prepended for interfaces of the topology 'single'.
+The prefix 'wgs_' will be prepended for interfaces of the topology 'single'.
 
 This prefix and much more can be changed as provided.
 
@@ -23,6 +23,10 @@ site_networks:
 
 # vpn config
 wireguard:
+  restart_on_change: true
+  support:
+    traffic_forwarding: true
+
   topologies:
     nl2de:
       type: 'single'  # single => default type
@@ -81,7 +85,7 @@ ansible-vault encrypt roles/ansibleguy.infra_wireguard/files/keys/some_file.key
 ```bash
 # status
 guy@srv03:~# wg show all
-> interface: wgS_nl2at
+> interface: wgs_nl2at
 >   public key: oqSWbjmFmA/YL+mMxABXERinS+EP/zLwvNQ8bBNnbDY=
 >   private key: (hidden)
 >   listening port: 51821
@@ -94,7 +98,7 @@ guy@srv03:~# wg show all
 >   transfer: 1.88 KiB received, 748 B sent
 >   persistent keepalive: every 25 seconds
 > 
-> interface: wgS_nl2de
+> interface: wgs_nl2de
 >   public key: bUeQ1vZSzwRubjghV1tzVaFgh7kEls6hgG0O9IHKXwM=
 >   private key: (hidden)
 >   listening port: 51820
@@ -106,8 +110,8 @@ guy@srv03:~# wg show all
 >   latest handshake: 4 minutes, 56 seconds ago
 >   transfer: 52.95 KiB received, 52.61 KiB sent
 
-guy@srv03:~# systemctl status wg-quick@wgS_nl2at.service 
-> ● wg-quick@wgS_nl2at.service - WireGuard via wg-quick(8) for wgS_nl2at
+guy@srv03:~# systemctl status wg-quick@wgs_nl2at.service 
+> ● wg-quick@wgs_nl2at.service - WireGuard via wg-quick(8) for wgs_nl2at
 >      Loaded: loaded (/lib/systemd/system/wg-quick@.service; enabled; vendor preset: enabled)
 >     Drop-In: /etc/systemd/system/wg-quick@.service.d
 >              └─override.conf
@@ -120,8 +124,8 @@ guy@srv03:~# systemctl status wg-quick@wgS_nl2at.service
 >              https://git.zx2c4.com/wireguard-tools/about/src/man/wg.8
 >              https://github.com/ansibleguy/infra_wireguard
 
-guy@srv03:~# systemctl status wg-quick@wgS_nl2de.service 
-> ● wg-quick@wgS_nl2de.service - WireGuard via wg-quick(8) for wgS_nl2de
+guy@srv03:~# systemctl status wg-quick@wgs_nl2de.service 
+> ● wg-quick@wgs_nl2de.service - WireGuard via wg-quick(8) for wgs_nl2de
 >      Loaded: loaded (/lib/systemd/system/wg-quick@.service; enabled; vendor preset: enabled)
 >     Drop-In: /etc/systemd/system/wg-quick@.service.d
 >              └─override.conf
@@ -137,11 +141,11 @@ guy@srv03:~# systemctl status wg-quick@wgS_nl2de.service
 # config
 guy@srv03:~# ls -l /etc/wireguard/
 > drwxr-xr-x 2 root root 4096 Jan 29 21:25 keys
-> -rw-r----- 1 root root  430 Jan 29 21:27 wgS_nl2at.conf
-> -rw-r----- 1 root root  497 Jan 29 21:28 wgS_nl2de.conf
+> -rw-r----- 1 root root  430 Jan 29 21:27 wgs_nl2at.conf
+> -rw-r----- 1 root root  497 Jan 29 21:28 wgs_nl2de.conf
 
 
-guy@srv03:~# cat /etc/wireguard/wgS_nl2at.conf 
+guy@srv03:~# cat /etc/wireguard/wgs_nl2at.conf 
 > # Ansible managed
 > # ansibleguy.infra_wireguard
 > 
@@ -161,7 +165,7 @@ guy@srv03:~# cat /etc/wireguard/wgS_nl2at.conf
 > AllowedIPs = 10.100.0.6/32, 192.168.70.0/24
 > PersistentKeepalive = 25
 
-guy@srv03:~# cat /etc/wireguard/wgS_nl2de.conf 
+guy@srv03:~# cat /etc/wireguard/wgs_nl2de.conf 
 > # Ansible managed
 > # ansibleguy.infra_wireguard
 > 
@@ -187,23 +191,23 @@ guy@srv03:~# route -n
 > Kernel IP routing table
 > Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
 > 0.0.0.0         GW              0.0.0.0         UG    0      0        0 eth0
-> 10.100.0.0      0.0.0.0         255.255.255.252 U     0      0        0 wgS_nl2de
-> 10.100.0.4      0.0.0.0         255.255.255.252 U     0      0        0 wgS_nl2at
-> 192.168.40.0    0.0.0.0         255.255.255.0   U     100    0        0 wgS_nl2de
+> 10.100.0.0      0.0.0.0         255.255.255.252 U     0      0        0 wgs_nl2de
+> 10.100.0.4      0.0.0.0         255.255.255.252 U     0      0        0 wgs_nl2at
+> 192.168.40.0    0.0.0.0         255.255.255.0   U     100    0        0 wgs_nl2de
 
 guy@srv03:~# ip a
-> # prettyfied
-> 12: wgS_nl2at: <POINTOPOINT,NOARP,UP,LOWER_UP> mtu 1500 qdisc noqueue state UNKNOWN group default qlen 1000
->     inet 10.100.0.5/30 scope global wgS_nl2at
-> 13: wgS_nl2de: <POINTOPOINT,NOARP,UP,LOWER_UP> mtu 1500 qdisc noqueue state UNKNOWN group default qlen 1000
->     inet 10.100.0.1/30 scope global wgS_nl2de
+# prettyfied
+> 12: wgs_nl2at: <POINTOPOINT,NOARP,UP,LOWER_UP> mtu 1500 qdisc noqueue state UNKNOWN group default qlen 1000
+>     inet 10.100.0.5/30 scope global wgs_nl2at
+> 13: wgs_nl2de: <POINTOPOINT,NOARP,UP,LOWER_UP> mtu 1500 qdisc noqueue state UNKNOWN group default qlen 1000
+>     inet 10.100.0.1/30 scope global wgs_nl2de
 ```
 
 ### SRV04
 ```bash
 # status
 guy@srv04:~# wg show all
-> interface: wgS_nl2de
+> interface: wgs_nl2de
 >   public key: V0WLyIRRHSCTOe8+POwsIUOlvxEfECoK1uqSPcenbH0=
 >   private key: (hidden)
 >   listening port: 51820
@@ -218,7 +222,7 @@ guy@srv04:~# wg show all
 # config
 guy@srv04:~# ls -l /etc/wireguard/
 > drwxr-xr-x 2 root root 4096 Jan 29 15:36 keys
-> -rw-r----- 1 root root  497 Jan 29 15:36 wgS_nl2de.conf
+> -rw-r----- 1 root root  497 Jan 29 15:36 wgs_nl2de.conf
 
 guy@srv04:~# cat /etc/wireguard/nl2de.conf 
 > # Ansible managed
@@ -246,20 +250,20 @@ guy@srv04:~# route -n
 > Kernel IP routing table
 > Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
 > 0.0.0.0         GW              0.0.0.0         UG    0      0        0 eth0
-> 10.100.0.0      0.0.0.0         255.255.255.252 U     0      0        0 wgS_nl2de
-> 192.168.30.0    0.0.0.0         255.255.255.0   U     10     0        0 wgS_nl2de
+> 10.100.0.0      0.0.0.0         255.255.255.252 U     0      0        0 wgs_nl2de
+> 192.168.30.0    0.0.0.0         255.255.255.0   U     10     0        0 wgs_nl2de
 
 guy@srv04:~# ip a
-> # prettyfied
-> 19: wgS_nl2de: <POINTOPOINT,NOARP,UP,LOWER_UP> mtu 1500 qdisc noqueue state UNKNOWN group default qlen 1000
->     inet 10.100.0.2/30 scope global wgS_nl2de
+# prettyfied
+> 19: wgs_nl2de: <POINTOPOINT,NOARP,UP,LOWER_UP> mtu 1500 qdisc noqueue state UNKNOWN group default qlen 1000
+>     inet 10.100.0.2/30 scope global wgs_nl2de
 ```
 
 ### SRV07
 ```bash
 # status
 guy@srv07:~# wg show all
-> interface: wgS_nl2at
+> interface: wgs_nl2at
 >   public key: CyKlu3qdIQDePC48PIpn3LQBukUCy7EPMZ5fkfgfnzI=
 >   private key: (hidden)
 >   listening port: 38876
@@ -275,7 +279,7 @@ guy@srv07:~# wg show all
 # config
 guy@srv07:~# ls -l /etc/wireguard/
 > drwxr-xr-x 2 root root 4096 Jan 29 14:52 keys
-> -rw-r----- 1 root root  449 Jan 29 16:25 wgS_nl2at.conf
+> -rw-r----- 1 root root  449 Jan 29 16:25 wgs_nl2at.conf
 
 guy@srv07:~# cat /etc/wireguard/nl2at.conf 
 > # Ansible managed
@@ -288,6 +292,7 @@ guy@srv07:~# cat /etc/wireguard/nl2at.conf
 > PostUp = wg set %i private-key /etc/wireguard/keys/nl2at_srv07.key
 > MTU = 1500
 > Table = 1000
+> PostUp = if ! ip rule show | grep -q '1000';then ip rule add to all lookup 1000;fi
 > DNS = 1.1.1.1, 8.8.8.8
 > 
 > [Peer]
@@ -298,15 +303,15 @@ guy@srv07:~# cat /etc/wireguard/nl2at.conf
 > PersistentKeepalive = 25
 
 # interfaces & routing
-guy@srv07:~# route -n
-> Kernel IP routing table
-> Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
-> 0.0.0.0         GW              0.0.0.0         UG    0      0        0 ens18
-> 10.100.0.4      0.0.0.0         255.255.255.252 U     0      0        0 wgS_nl2at
+guy@srv07:~# ip route show table all | grep -vE '^(broadcast|local)\s'
+# prettyfied
+> 10.100.0.5 dev nl2at table 1000 scope link 
+> 192.168.30.0/24 dev nl2at table 1000 scope link 
+> 10.100.0.4/30 dev nl2at proto kernel scope link src 10.100.0.6
 
 guy@srv07:~# ip a
-> # prettyfied
-> 20: wgS_nl2at: <POINTOPOINT,NOARP,UP,LOWER_UP> mtu 1500 qdisc noqueue state UNKNOWN group default qlen 1000
->     inet 10.100.0.6/30 scope global wgS_nl2at
+# prettyfied
+> 20: wgs_nl2at: <POINTOPOINT,NOARP,UP,LOWER_UP> mtu 1500 qdisc noqueue state UNKNOWN group default qlen 1000
+>     inet 10.100.0.6/30 scope global wgs_nl2at
 
 ```

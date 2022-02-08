@@ -14,11 +14,14 @@ This was done before running this example:
 You have to mind some cases when you configure a star-topology:
 
 * The central server needs to be reachable per static IP or public DNS
-* We would not recommend using the auto-added routes on the center node!
 
-  A configuration error could lock you out as the routes get added with a metric of zero!
+* **AllowedIPs MUST BE SET** for this topology-type!
 
-  Also: the build-in auto-added routes will not work for this kind of connection as the gateway is not set.
+* Background info to auto-added routes on the center-node:
+
+  The build-in auto-added routes will not work for this kind of connection as the gateway is not set. 
+  
+  Therefore, we have implemented a replacement for these. See below for results.
 
 * There may only be one central server!
   
@@ -26,9 +29,13 @@ You have to mind some cases when you configure a star-topology:
 
 * Don't forget to allowed forwarded traffic using iptables or ufw!
 
+* Auto-added routes depend on correctly configured 'AllowedIPs'.
+
+  The default value (_0.0.0.0/0 & ::/0_) will not work for multiple peers at once.
+
 Basically the edge-nodes are using the 'single' config and the 'center' node has a customized config with N peers.
 
-The prefix 'wgX_' will be prepended for interfaces of the topology 'star'.
+The prefix 'wgx_' will be prepended for interfaces of the topology 'star'.
 
 This prefix and much more can be changed as provided.
 
@@ -48,32 +55,29 @@ site_networks:
 
 # vpn config
 wireguard:
+  restart_on_change: true
   support:
     traffic_forwarding: true
 
   topologies:
     dc_nl:
       type: 'star'
+      Route: true  # auto-add routes to peer 'AllowedIPs'
       peers:
         srv03:
           role: 'center'
           Endpoint: 'srv03.wg.template.ansibleguy.net'
           Address: "{{ site_networks.nl.ip }}/24"
           AllowedIPs: "{{ site_networks.super }}"  # can be list or single element
-          PostUp:
-            - "ip route add {{ site_networks.de.net }} metric 100 dev %i via {{ site_networks.de.ip }}"
-            - "ip route add {{ site_networks.at.net }} metric 100 dev %i via {{ site_networks.at.ip }}"
 
         srv04:
           Endpoint: 'srv04.wg.template.ansibleguy.net'
           Address: "{{ site_networks.de.ip }}/24"
-          Route: true  # auto-add routes to peer 'AllowedIPs'
           AllowedIPs: "{{ site_networks.de.net }}"
 
         srv07:  # srv07 is behind a firewall
           Address: "{{ site_networks.at.ip }}/24"
           ListenPort: ''  # does not need to listen on any port
-          Route: true
           NATed: true
           AllowedIPs: "{{ site_networks.at.net }}"
 ```
@@ -103,7 +107,7 @@ ansible-vault encrypt roles/ansibleguy.infra_wireguard/files/keys/some_file.key
 ```bash
 # status
 guy@srv03:~# wg show all
-> interface: wgX_dc_nl
+> interface: wgx_dc_nl
 >   public key: BkxQWjX6k1QxP75uRxnFjCWOozNR9dJEQaWiPcXBDzE=
 >   private key: (hidden)
 >   listening port: 51820
@@ -124,7 +128,7 @@ guy@srv03:~# wg show all
 >   transfer: 596 B received, 476 B sent
 
 guy@srv03:~# systemctl status wg-quick@*
-> ● wg-quick@wgX_dc_nl.service - WireGuard via wg-quick(8) for wgX_dc_nl
+> ● wg-quick@wgx_dc_nl.service - WireGuard via wg-quick(8) for wgx_dc_nl
 >      Loaded: loaded (/lib/systemd/system/wg-quick@.service; disabled; vendor preset: enabled)
 >     Drop-In: /etc/systemd/system/wg-quick@.service.d
 >              └─override.conf
@@ -138,7 +142,7 @@ guy@srv03:~# systemctl status wg-quick@*
 >              https://github.com/ansibleguy/infra_wireguard
 
 # config
-guy@srv03:~# cat /etc/wireguard/wgX_dc_nl.conf 
+guy@srv03:~# cat /etc/wireguard/wgx_dc_nl.conf 
 > # Ansible managed
 > # ansibleguy.infra_wireguard
 > 
@@ -152,9 +156,11 @@ guy@srv03:~# cat /etc/wireguard/wgX_dc_nl.conf
 > MTU = 1500
 > Table = off
 > DNS = 1.1.1.1, 8.8.8.8
-> PostUp = ip route add 192.168.40.0/24 metric 100 dev %i via 10.100.10.4
-> PostUp = ip route add 192.168.70.0/24 metric 100 dev %i via 10.100.10.7
-> 
+>
+> # auto-routes
+> PostUp = ip route add 192.168.40.0/24 dev %i metric 101 via 10.100.10.4
+> PostUp = ip route add 192.168.70.0/24 dev %i metric 101 via 10.100.10.7
+>  
 > [Peer]
 > # srv04
 > PublicKey = Nujd72NiAZHzxBBIrXAs6JuoAhvkgKtp7zIe8+V7cio=
@@ -174,14 +180,14 @@ guy@srv03:~# route -n
 > Kernel IP routing table
 > Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
 > 0.0.0.0         GW              0.0.0.0         UG    0      0        0 eth0
-> 10.100.10.0     0.0.0.0         255.255.255.0   U     0      0        0 wgX_dc_nl
-> 192.168.40.0    10.100.10.4     255.255.255.0   UG    100    0        0 wgX_dc_nl
-> 192.168.70.0    10.100.10.7     255.255.255.0   UG    100    0        0 wgX_dc_nl
+> 10.100.10.0     0.0.0.0         255.255.255.0   U     0      0        0 wgx_dc_nl
+> 192.168.40.0    10.100.10.4     255.255.255.0   UG    100    0        0 wgx_dc_nl
+> 192.168.70.0    10.100.10.7     255.255.255.0   UG    100    0        0 wgx_dc_nl
 
 guy@srv03:~# ip a
-> # prettyfied
-> 9: wgX_dc_nl: <POINTOPOINT,NOARP,UP,LOWER_UP> mtu 1500 qdisc noqueue state UNKNOWN group default qlen 1000
->     inet 10.100.10.3/24 scope global wgX_dc_nl
+# prettyfied
+> 9: wgx_dc_nl: <POINTOPOINT,NOARP,UP,LOWER_UP> mtu 1500 qdisc noqueue state UNKNOWN group default qlen 1000
+>     inet 10.100.10.3/24 scope global wgx_dc_nl
 ```
 
 ### SRV04
@@ -189,7 +195,7 @@ guy@srv03:~# ip a
 ```bash
 # status
 guy@srv04:~# wg show all
-> interface: wgX_dc_nl
+> interface: wgx_dc_nl
 >   public key: Nujd72NiAZHzxBBIrXAs6JuoAhvkgKtp7zIe8+V7cio=
 >   private key: (hidden)
 >   listening port: 51820
@@ -200,7 +206,7 @@ guy@srv04:~# wg show all
 >   allowed ips: 10.100.10.3/32, 192.168.0.0/17
 
 # config
-guy@srv04:~# cat /etc/wireguard/wgX_dc_nl.conf 
+guy@srv04:~# cat /etc/wireguard/wgx_dc_nl.conf 
 > # Ansible managed
 > # ansibleguy.infra_wireguard
 > 
@@ -213,6 +219,7 @@ guy@srv04:~# cat /etc/wireguard/wgX_dc_nl.conf
 > PostUp = wg set %i private-key /etc/wireguard/keys/dc_nl_srv04.key
 > MTU = 1500
 > Table = 1000
+> PostUp = if ! ip rule show | grep -q '1000';then ip rule add to all lookup 1000;fi
 > DNS = 1.1.1.1, 8.8.8.8
 > 
 > [Peer]
@@ -222,16 +229,16 @@ guy@srv04:~# cat /etc/wireguard/wgX_dc_nl.conf
 > Endpoint = srv03.wg.template.ansibleguy.net:51820
 
 # interfaces & routing
-guy@srv04:~# route -n
-> Kernel IP routing table
-> Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
-> 0.0.0.0         GW              0.0.0.0         UG    0      0        0 eth0
-> 10.100.10.0     0.0.0.0         255.255.255.0   U     0      0        0 wgX_dc_nl
+guy@srv04:~# ip route show table all | grep -vE '^(broadcast|local)\s' 
+# prettyfied
+> 10.100.10.3 dev wgx_dc_nl table 1000 scope link 
+> 192.168.0.0/17 dev wgx_dc_nl table 1000 scope link 
+> 10.100.10.0/24 dev wgx_dc_nl proto kernel scope link src 10.100.10.4
 
 guy@srv04:~# ip a
-> # prettyfied
-> 17: wgX_dc_nl: <POINTOPOINT,NOARP,UP,LOWER_UP> mtu 1500 qdisc noqueue state UNKNOWN group default qlen 1000
->     inet 10.100.10.4/24 scope global wgX_dc_nl
+# prettyfied
+> 17: wgx_dc_nl: <POINTOPOINT,NOARP,UP,LOWER_UP> mtu 1500 qdisc noqueue state UNKNOWN group default qlen 1000
+>     inet 10.100.10.4/24 scope global wgx_dc_nl
 ```
 
 ### SRV07
@@ -239,7 +246,7 @@ guy@srv04:~# ip a
 ```bash
 # status
 guy@srv07:~# wg show all
-> interface: wgX_dc_nl
+> interface: wgx_dc_nl
 >   public key: 7KKTmFPW+nup7M0PlzgeUKcul1d5GY/F2JUIeAwEZRQ=
 >   private key: (hidden)
 >   listening port: 52255
@@ -252,7 +259,7 @@ guy@srv07:~# wg show all
 >   transfer: 14.91 KiB received, 16.17 KiB sent
 
 # config
-guy@srv07:~# cat /etc/wireguard/wgX_dc_nl.conf 
+guy@srv07:~# cat /etc/wireguard/wgx_dc_nl.conf 
 > # Ansible managed
 > # ansibleguy.infra_wireguard
 > 
@@ -264,8 +271,12 @@ guy@srv07:~# cat /etc/wireguard/wgX_dc_nl.conf
 > PostUp = wg set %i private-key /etc/wireguard/keys/dc_nl_srv07.key
 > MTU = 1500
 > Table = 1000
+> PostUp = if ! ip rule show | grep -q '1000';then ip rule add to all lookup 1000;fi
 > DNS = 1.1.1.1, 8.8.8.8
 > 
+> # get dynamic endpoint to re-/connect
+> PostUp = /bin/bash -c "while sleep 120 ; do ping -c4 10.100.10.3 > /dev/null 2>&1 ; done &"
+>
 > [Peer]
 > PublicKey = BkxQWjX6k1QxP75uRxnFjCWOozNR9dJEQaWiPcXBDzE=
 > PresharedKey = NNMpluiPivWCGmV78jnkXyjL5JQYmr2/FFuIjp0Lxos=
@@ -273,15 +284,15 @@ guy@srv07:~# cat /etc/wireguard/wgX_dc_nl.conf
 > Endpoint = srv03.wg.template.ansibleguy.net:51820
 
 # interfaces & routing
-guy@srv07:~# route -n
-> Kernel IP routing table
-> Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
-> 0.0.0.0         GW              0.0.0.0         UG    0      0        0 eth0
-> 10.100.10.0     0.0.0.0         255.255.255.0   U     0      0        0 wgX_dc_nl
+guy@srv07:~# ip route show table all | grep -vE '^(broadcast|local)\s' 
+# prettyfied
+> 10.100.10.3 dev wgx_dc_nl table 1000 scope link 
+> 192.168.0.0/17 dev wgx_dc_nl table 1000 scope link 
+> 10.100.10.0/24 dev wgx_dc_nl proto kernel scope link src 10.100.10.7
 
 guy@srv07:~# ip a
-> # prettyfied
-> 18: wgX_dc_nl: <POINTOPOINT,NOARP,UP,LOWER_UP> mtu 1500 qdisc noqueue state UNKNOWN group default qlen 1000
->     inet 10.100.10.7/24 scope global wgX_dc_nl
+# prettyfied
+> 18: wgx_dc_nl: <POINTOPOINT,NOARP,UP,LOWER_UP> mtu 1500 qdisc noqueue state UNKNOWN group default qlen 1000
+>     inet 10.100.10.7/24 scope global wgx_dc_nl
 ```
 
