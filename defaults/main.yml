@@ -38,9 +38,10 @@ default_wg:
   restart_on_change: false  # allow the wg-services to be restarted on changes
   continuous_installs: 50
   int_prefix:
-    single: 'wgS'
-    star: 'wgX'
-    mesh: 'wgM'
+    single: 'wgs'
+    star: 'wgx'
+    mesh: 'wgm'
+  dynamic_contact_sleep: 120
 
 WG_CONFIG: "{{ default_wg | combine(wireguard, recursive=true) }}"
 
@@ -67,6 +68,10 @@ default_local_config:
   Table: 'off'
   # set to number (p.e. 1000) to enable auto-added routes
   # if you do so, you will most probably need to modify your peers 'AllowedIPs' or lock yourself out (;
+  TablePref: ''
+  # set to number between 1 and 32765 as a preference for the given routing table
+  # cmd: "ip rule add to all lookup {{ wg_local.Table }}{% if wg_local.TablePref != ''%} pref {{ wg_local.TablePref }}"
+  # cmd del: "ip route del prio {{ wg_local.TablePref }}"
   Route: false  # alternative switch to auto-add routes
   NATed: false  # alternative switch to enable keepalive
   role: 'edge'  # center/edge

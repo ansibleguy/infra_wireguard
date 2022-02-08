@@ -1,0 +1,4 @@
+{# get dynamic endpoint to re-/connect #}
+{% for ip in wg_peer.Address | ensure_list %}
+PostUp = /bin/bash -c "while sleep {{ WG_CONFIG.dynamic_contact_sleep }} ; do ping -c4 {{ ip.split('/')[0] }} > /dev/null 2>&1 ; done &"
+{% endfor %}

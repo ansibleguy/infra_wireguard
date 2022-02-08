@@ -6,20 +6,16 @@
 # role: {{ wg_local.role }}
 {% endif %}
 
-{% include "base.conf.j2" %}
+{% include "inc/base.conf.j2" %}
+{% if topology.type == 'star' and (wg_local.Route or topology.Route) %}
 
-[Peer]
-PublicKey = {{ lookup('file', peer_pubkey_file) }}
-{% if topology.psk %}
-PresharedKey = {{ lookup('file', psk_file) }}
-{% endif %}
-AllowedIPs = {% for ip in wg_peer.Address | ensure_list %}{{ ip.split('/')[0] }}{% if ip | ansible.netcommon.ipv4 %}/32{% else %}/128{% endif %}{% if not loop.last %}, {% endif %}{% endfor %}{% for net in wg_peer.AllowedIPs | ensure_list %}, {{ net }}{% endfor %}
+# auto-routes
+{% include "inc/routing.conf.j2" %}
 
-{% if wg_peer.ListenPort != '' and wg_peer.Endpoint != '' %}
-Endpoint = {{ wg_peer.Endpoint }}:{{ wg_peer.ListenPort }}
 {% endif %}
-{% if wg_peer.PersistentKeepalive != 0 %}
-PersistentKeepalive = {{ wg_peer.PersistentKeepalive }}
-{% elif wg_peer.NATed or topology.NATed %}
-PersistentKeepalive = {{ WG_HC.default_keepalive }}
+{% if wg_local.Endpoint is undefined or wg_local.Endpoint == '' %}
+# get dynamic endpoint to re-/connect
+{%   include "inc/dynamic.conf.j2" %}
 {% endif %}
+
+{% include "inc/peer.conf.j2" %}

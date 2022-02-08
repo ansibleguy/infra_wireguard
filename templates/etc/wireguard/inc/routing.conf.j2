@@ -1,13 +1,10 @@
-
-# mesh routing
-{% for peer_name, raw_peer in wg_peers.items() %}
-{%   set wg_peer = default_peer_config | combine(raw_peer, recursive=true) %}
-#   {{ peer_name }}
-{%   for net in wg_peer.AllowedIPs | ensure_list %}
-{%     for gw in wg_peer.Address | ensure_list %}
+{# custom implementation of auto-added routes for topologies where a gateway is needed #}
+{% for net in wg_peer.AllowedIPs | ensure_list %}
+{%   for gw in wg_peer.Address | ensure_list %}
+{%     if gw.split('/')[0] != net.split('/')[0] %}
 {%       if (gw | ansible.netcommon.ipv4 and net | ansible.netcommon.ipv4) or (gw | ansible.netcommon.ipv6 and net | ansible.netcommon.ipv6) %}
 PostUp = ip route add {{ net }} dev %i metric {{ WG_HC.default_routing_metric + loop.index }} via {{ gw.split('/')[0] }}
 {%       endif %}
-{%     endfor %}
+{%     endif %}
 {%   endfor %}
 {% endfor %}

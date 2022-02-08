@@ -32,19 +32,6 @@
   no_log: true
   tags: [tunnels, config]
 
-- name: "Wireguard | Debian | Topology {{ topo_name }} | {{ host }} keys | Writing key to file on controller"
-  ansible.builtin.copy:
-    content: "{{ wg_key_gen.stdout }}"
-    dest: "{{ role_path }}/files/keys/{{ privkey_file }}"
-    mode: 0640
-    force: no
-  delegate_to: localhost
-  become: false
-  when: not wg_key_file.stat.exists
-  no_log: true
-  tags: [tunnels, config]
-  throttle: 1
-
 - name: "Wireguard | Debian | Topology {{ topo_name }} | {{ host }} keys | Generating missing public-key"
   ansible.builtin.command: 'wg pubkey'
   args:
@@ -54,11 +41,11 @@
   no_log: true
   tags: [tunnels, config]
 
-- name: "Wireguard | Debian | Topology {{ topo_name }} | {{ host }} keys | Writing public-key to file on controller"
+- name: "Wireguard | Debian | Topology {{ topo_name }} | {{ host }} keys | Writing keys to file on controller"
   ansible.builtin.copy:
-    content: "{{ wg_pub_gen.stdout }}"
-    dest: "{{ role_path }}/files/keys/{{ pubkey_file }}"
-    mode: 0644
+    content: "{{ item.content }}"
+    dest: "{{ role_path }}/files/keys/{{ item.file }}"
+    mode: 0640
     force: no
   delegate_to: localhost
   become: false
@@ -66,3 +53,6 @@
   no_log: true
   tags: [tunnels, config]
   throttle: 1
+  loop:
+    - {content: "{{ wg_key_gen.stdout }}", file: "{{ privkey_file }}"}
+    - {content: "{{ wg_pub_gen.stdout }}", file: "{{ pubkey_file }}"}

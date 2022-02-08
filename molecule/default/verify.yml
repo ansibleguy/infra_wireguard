@@ -49,7 +49,7 @@
       ansible.builtin.command: 'ping -c 4 172.30.24.1 -I 172.30.22.1'
       changed_when: false
 
-- name: Redundant Star | Normal | Center1 to Any
+- name: Redundant Star | Normal | Center1 to Any (Auto-Routed)
   hosts: test-ag-wg-x5
   gather_facts: false
   tasks:

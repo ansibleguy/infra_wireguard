@@ -254,5 +254,8 @@ platforms:
 
 provisioner:
   name: ansible
+  config_options:
+    defaults:
+      vault_password_file: '/tmp/.molecule.vault'
 verifier:
   name: ansible

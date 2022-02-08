@@ -6,28 +6,25 @@
 # role: {{ wg_local.role }}
 {% endif %}
 
-{% include "base.conf.j2" %}
-{% if topology.type == 'mesh' and (wg_local.Route or topology.Route) %}
-{% include "mesh.conf.j2" %}
+{% include "inc/base.conf.j2" %}
+{% if wg_local.Route or topology.Route %}
+{%   include "inc/many_routing.conf.j2" %}
+{% endif %}
+
+{% if wg_local.Endpoint is undefined or wg_local.Endpoint == '' %}
+# get dynamic endpoint to re-/connect
+{%   for raw_peer in wg_peers.values() %}
+{%     set wg_peer = default_peer_config | combine(raw_peer, recursive=true) %}
+{%     include "inc/dynamic.conf.j2" %}
+{%   endfor %}
 {% endif %}
 
 {% for peer_name, raw_peer in wg_peers.items() %}
 {%   set wg_peer = default_peer_config | combine(raw_peer, recursive=true) %}
-[Peer]
-# {{ peer_name }}
-PublicKey = {{ lookup('file', role_path + '/files/keys/' + topo_name + '_' + peer_name + '.' + WG_HC.ext.pub) }}
-{%   if topology.psk %}
-PresharedKey = {{ lookup('file', psk_file) }}
-{%   endif %}
-AllowedIPs = {% for ip in wg_peer.Address | ensure_list %}{{ ip.split('/')[0] }}{% if ip | ansible.netcommon.ipv4 %}/32{% else %}/128{% endif %}{% if not loop.last %}, {% endif %}{% endfor %}{% for net in wg_peer.AllowedIPs | ensure_list %}, {{ net }}{% endfor %}
-
-{%   if wg_peer.ListenPort != '' and wg_peer.Endpoint != '' %}
-Endpoint = {{ wg_peer.Endpoint }}:{{ wg_peer.ListenPort }}
-{%   endif %}
-{%   if wg_peer.PersistentKeepalive != 0 %}
-PersistentKeepalive = {{ wg_peer.PersistentKeepalive }}
-{%   elif wg_peer.NATed or topology.NATed %}
-PersistentKeepalive = {{ WG_HC.default_keepalive }}
+{%   set peer_pubkey_file = role_path + '/files/keys/' + topo_name + '_' + peer_name + '.' + WG_HC.ext.pub %}
+{%   include "inc/peer.conf.j2" %}
+{%   if wg_peer.AllowedIPs == default_peer_config.AllowedIPs %}
+# WARN: using non-specific remote networks for star-center & mesh WILL NOT WORK properly!
 {%   endif %}
 
 {% endfor %}

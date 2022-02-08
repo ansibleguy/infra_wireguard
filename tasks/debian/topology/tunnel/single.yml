@@ -2,6 +2,7 @@
 
 - name: "Wireguard | Debian | Topology {{ topo_name }} | Single | Tunnel | Getting peer config"
   ansible.builtin.set_fact:
+    peer_name: "{{ peer_item.key }}"
     wg_peer: "{{ default_peer_config | combine(peer_item.value, recursive=true) }}"
     peer_pubkey_file: "{{ role_path }}/files/keys/{{ topo_name }}_{{ peer_item.key }}.{{ WG_HC.ext.pub }}"
   when: peer_item.key != inventory_hostname

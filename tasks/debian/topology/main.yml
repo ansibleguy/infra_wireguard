@@ -1,9 +1,9 @@
 ---
 
 - name: "Wireguard | Debian | Topology {{ topo_name }} | Checking config"
-  ansible.builtin.fail:
-    msg: 'UNSUPPORTED CONFIG: You have supplied a non-supported topology-type! Available: single, star, mesh'
-  when: "topology.type not in ['single', 'star', 'mesh']"
+  ansible.builtin.assert:
+    that:
+      - "topology.type in ['single', 'star', 'mesh']"
   tags: [tunnels, config]
 
 - name: "Wireguard | Debian | Topology {{ topo_name }} | Checking star-config"

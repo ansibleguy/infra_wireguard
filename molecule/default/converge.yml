@@ -1,7 +1,7 @@
 ---
 
 - name: Converge
-  hosts: all
+  hosts: all  # all test-ag-wg-x3, test-ag-wg-x1, test-ag-wg-x2,
   strategy: free  # speed-up; comment-out to gain clarity
   vars:
     # here we actually configure the WireGuard topologies
@@ -154,38 +154,38 @@
               Endpoint: "{{ sites.x2.ip }}"
               Address: "{{ sites.x2.wgip }}/{{ tops.tx1.wgsn }}"
               PostUp: "ip route add {{ sites.x1.super }} dev %i metric 100 via {{ sites.x1.wgip }}"
+              AllowedIPs: "{{ sites.x2.nw }}"
             test-ag-wg-x3:
               Endpoint: "{{ sites.x3.ip }}"
               Address: "{{ sites.x3.wgip }}/{{ tops.tx1.wgsn }}"
+              AllowedIPs: "{{ sites.x3.nw }}"
               Route: true
             test-ag-wg-x4:
               Address: "{{ sites.x4.wgip }}/{{ tops.tx1.wgsn }}"
               Route: true
               NATed: true
+              AllowedIPs: "{{ sites.x4.nw }}"
         tx2:
           type: 'star'
+          Route: true
           peers:
             test-ag-wg-x5:
               role: 'center'
               Endpoint: "{{ sites.x5.ip }}"
               Address: "{{ sites.x5.wgip1 }}/{{ tops.tx2.wgsn }}"
               AllowedIPs: "{{ sites.x5.super }}"
-              PostUp:
-                - "ip route add {{ sites.x6.nw }} dev %i metric {{ sites.x5.metric }} via {{ sites.x6.wgip1 }}"
-                - "ip route add {{ sites.x7.nw }} dev %i metric {{ sites.x5.metric }} via {{ sites.x7.wgip1 }}"
-                - "ip route add {{ sites.x8.nw }} dev %i metric {{ sites.x5.metric }} via {{ sites.x8.wgip1 }}"
             test-ag-wg-x6:
               Endpoint: "{{ sites.x6.ip }}"
               Address: "{{ sites.x6.wgip1 }}/{{ tops.tx2.wgsn }}"
-              PostUp: "ip route add {{ sites.x5.super }} dev %i metric {{ sites.x5.metric }} via {{ sites.x5.wgip1 }}"
+              AllowedIPs: "{{ sites.x6.nw }}"
             test-ag-wg-x7:
               Endpoint: "{{ sites.x7.ip }}"
               Address: "{{ sites.x7.wgip1 }}/{{ tops.tx2.wgsn }}"
-              PostUp: "ip route add {{ sites.x5.super }} dev %i metric {{ sites.x5.metric }} via {{ sites.x5.wgip1 }}"
+              AllowedIPs: "{{ sites.x7.nw }}"
             test-ag-wg-x8:
               Address: "{{ sites.x8.wgip1 }}/{{ tops.tx2.wgsn }}"
               NATed: true
-              PostUp: "ip route add {{ sites.x5.super }} dev %i metric {{ sites.x5.metric }} via {{ sites.x5.wgip1 }}"
+              AllowedIPs: "{{ sites.x8.nw }}"
         tx3:
           type: 'star'
           peers:
@@ -194,6 +194,7 @@
               Address: "{{ sites.x5.wgip2 }}/{{ tops.tx2.wgsn }}"
               PostUp: "ip route add {{ sites.x6.super }} dev %i metric {{ sites.x6.metric }} via {{ sites.x6.wgip2 }}"
               ListenPort: 51821
+              AllowedIPs: "{{ sites.x5.nw }}"
             test-ag-wg-x6:
               role: 'center'
               Endpoint: "{{ sites.x6.ip }}"
@@ -209,6 +210,7 @@
               Address: "{{ sites.x7.wgip2 }}/{{ tops.tx2.wgsn }}"
               PostUp: "ip route add {{ sites.x6.super }} dev %i metric {{ sites.x6.metric }} via {{ sites.x6.wgip2 }}"
               ListenPort: 51821
+              AllowedIPs: "{{ sites.x7.nw }}"
             test-ag-wg-x8:
               Address: "{{ sites.x8.wgip2 }}/{{ tops.tx2.wgsn }}"
               NATed: true
