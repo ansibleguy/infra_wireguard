@@ -25,11 +25,14 @@
   delegate_to: localhost
   become: false
   when: topology.psk
+  throttle: 1
   tags: [tunnels, config]
 
 - name: "Wireguard | Debian | Topology {{ topo_name }} | Generating missing psk"
   ansible.builtin.command: 'wg genpsk'
   register: wg_psk_gen
+  throttle: 1
+  changed_when: false
   when:
     - topology.psk
     - not wg_psk_file.stat.exists
@@ -42,6 +45,7 @@
     mode: 0640
   delegate_to: localhost
   become: false
+  throttle: 1
   when:
     - topology.psk
     - not wg_psk_file.stat.exists

@@ -1,4 +1,5 @@
 from re import sub as regex_replace
+from os import path as os_path
 
 
 class FilterModule(object):
@@ -12,6 +13,8 @@ class FilterModule(object):
             "one_center": self.one_center,
             "star_edge_peers": self.star_edge_peers,
             "mesh_peers": self.mesh_peers,
+            "write_keys": self.write_keys,
+            "all_exist": self.all_exist,
         }
 
     @staticmethod
@@ -81,3 +84,19 @@ class FilterModule(object):
 
         else:
             return [data]
+
+    @staticmethod
+    def write_keys(pub: str, file_pub: str, pk: str, file_pk: str) -> bool:
+        # to solve race condition (pk and pub not from same 'run')
+        if not os_path.exists(file_pub) and not os_path.exists(file_pk):
+            with open(file_pub, 'w') as fpub:
+                with open(file_pk, 'w') as fpk:
+                    fpub.write(pub)
+                    fpk.write(pk)
+                    return True
+
+        return False
+
+    @staticmethod
+    def all_exist(data: list) -> bool:
+        return all([result['stat']['exists'] for result in data])

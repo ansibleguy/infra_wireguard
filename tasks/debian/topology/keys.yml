@@ -1,58 +1,45 @@
 ---
 
-# todo: fix race condition => pk and pub might be written by different hosts and not match
-#   maybe let every host generate its own key
-#   that would need implementation of key-existence checks/catching
-
 - ansible.builtin.set_fact:
-    pubkey_file: "{{ topo_name }}_{{ host }}.{{ WG_HC.ext.pub }}"
-    privkey_file: "{{ topo_name }}_{{ host }}.{{ WG_HC.ext.key }}"
+    pubkey_file: "{{ role_path }}/files/keys/{{ topo_name }}_{{ host }}.{{ WG_HC.ext.pub }}"
+    privkey_file: "{{ role_path }}/files/keys/{{ topo_name }}_{{ host }}.{{ WG_HC.ext.key }}"
   tags: [tunnels, config]
 
 - name: "Wireguard | Debian | Topology {{ topo_name }} | {{ host }} keys | Checking if key exist on the controller"
   ansible.builtin.stat:
-    path: "{{ role_path }}/files/keys/{{ privkey_file }}"
-  register: wg_key_file
+    path: "{{ item }}"
+  register: wg_key_files
   delegate_to: localhost
   become: false
-  tags: [tunnels, config]
-
-- name: "Wireguard | Debian | Topology {{ topo_name }} | {{ host }} keys | Checking if pub-key exist on the controller"
-  ansible.builtin.stat:
-    path: "{{ role_path }}/files/keys/{{ pubkey_file }}"
-  register: wg_pub_file
-  delegate_to: localhost
-  become: false
+  throttle: 1
+  loop:
+    - "{{ pubkey_file }}"
+    - "{{ privkey_file }}"
   tags: [tunnels, config]
 
 - name: "Wireguard | Debian | Topology {{ topo_name }} | {{ host }} keys | Generating missing key"
   ansible.builtin.command: 'wg genkey'
-  when: not wg_key_file.stat.exists
+  when: not wg_key_files.results | all_exist
   register: wg_key_gen
   no_log: true
+  throttle: 1
+  changed_when: false
   tags: [tunnels, config]
 
 - name: "Wireguard | Debian | Topology {{ topo_name }} | {{ host }} keys | Generating missing public-key"
   ansible.builtin.command: 'wg pubkey'
   args:
     stdin: "{{ wg_key_gen.stdout }}"
-  when: not wg_pub_file.stat.exists
+  when: not wg_key_files.results | all_exist
   register: wg_pub_gen
   no_log: true
+  throttle: 1
+  changed_when: false
   tags: [tunnels, config]
 
+# NOTE: workaround for race-condition while writing keys - sometimes pk didn't match pub
 - name: "Wireguard | Debian | Topology {{ topo_name }} | {{ host }} keys | Writing keys to file on controller"
-  ansible.builtin.copy:
-    content: "{{ item.content }}"
-    dest: "{{ role_path }}/files/keys/{{ item.file }}"
-    mode: 0640
-    force: no
-  delegate_to: localhost
-  become: false
-  when: not wg_key_file.stat.exists
+  ansible.builtin.debug:
+    msg: "{{ wg_pub_gen.stdout | write_keys(pubkey_file, wg_key_gen.stdout, privkey_file) }}"
   no_log: true
-  tags: [tunnels, config]
   throttle: 1
-  loop:
-    - {content: "{{ wg_key_gen.stdout }}", file: "{{ privkey_file }}"}
-    - {content: "{{ wg_pub_gen.stdout }}", file: "{{ pubkey_file }}"}

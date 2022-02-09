@@ -1,7 +1,7 @@
 ---
 
 - name: Converge
-  hosts: all  # all test-ag-wg-x3, test-ag-wg-x1, test-ag-wg-x2,
+  hosts: all
   strategy: free  # speed-up; comment-out to gain clarity
   vars:
     # here we actually configure the WireGuard topologies

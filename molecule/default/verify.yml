@@ -5,7 +5,7 @@
   gather_facts: false
   tasks:
   - name: S1 to S2 ping
-    ansible.builtin.command: 'ping -c 4 172.30.12.1 -I 172.30.11.1'
+    ansible.builtin.command: 'ping -c 2 172.30.12.1 -I 172.30.11.1'
     changed_when: false
 
 - name: Single Auto-Routed | Check
@@ -13,7 +13,7 @@
   gather_facts: false
   tasks:
     - name: S3 to S4 ping
-      ansible.builtin.command: 'ping -c 4 172.30.14.1 -I 172.30.13.1'
+      ansible.builtin.command: 'ping -c 2 172.30.14.1 -I 172.30.13.1'
       changed_when: false
 
 - name: Single NATed | Check
@@ -21,7 +21,7 @@
   gather_facts: false
   tasks:
     - name: S5 to S6 ping
-      ansible.builtin.command: 'ping -c 4 172.30.16.1 -I 172.30.15.1'
+      ansible.builtin.command: 'ping -c 2 172.30.16.1 -I 172.30.15.1'
       changed_when: false
 
 - name: Star | Center to Edges
@@ -29,13 +29,13 @@
   gather_facts: false
   tasks:
     - name: Center (X1) to X2 ping
-      ansible.builtin.command: 'ping -c 4 172.30.22.1 -I 172.30.21.1'
+      ansible.builtin.command: 'ping -c 2 172.30.22.1 -I 172.30.21.1'
       changed_when: false
     - name: Center (X1) to X3 ping
-      ansible.builtin.command: 'ping -c 4 172.30.23.1 -I 172.30.21.1'
+      ansible.builtin.command: 'ping -c 2 172.30.23.1 -I 172.30.21.1'
       changed_when: false
     - name: Center (X1) to X4 ping
-      ansible.builtin.command: 'ping -c 4 172.30.24.1 -I 172.30.21.1'
+      ansible.builtin.command: 'ping -c 2 172.30.24.1 -I 172.30.21.1'
       changed_when: false
 
 - name: Star | Edge to Edge (routed)
@@ -43,10 +43,10 @@
   gather_facts: false
   tasks:
     - name: X2 to X3 ping
-      ansible.builtin.command: 'ping -c 4 172.30.23.1 -I 172.30.22.1'
+      ansible.builtin.command: 'ping -c 2 172.30.23.1 -I 172.30.22.1'
       changed_when: false
     - name: X2 to X4 ping
-      ansible.builtin.command: 'ping -c 4 172.30.24.1 -I 172.30.22.1'
+      ansible.builtin.command: 'ping -c 2 172.30.24.1 -I 172.30.22.1'
       changed_when: false
 
 - name: Redundant Star | Normal | Center1 to Any (Auto-Routed)
@@ -54,13 +54,13 @@
   gather_facts: false
   tasks:
     - name: Center1 (X5) to Center2 (X6) ping
-      ansible.builtin.command: 'ping -c 4 172.30.26.1 -I 172.30.25.1'
+      ansible.builtin.command: 'ping -c 2 172.30.26.1 -I 172.30.25.1'
       changed_when: false
     - name: Center1 (X5) to X7 ping
-      ansible.builtin.command: 'ping -c 4 172.30.27.1 -I 172.30.25.1'
+      ansible.builtin.command: 'ping -c 2 172.30.27.1 -I 172.30.25.1'
       changed_when: false
     - name: Center1 (X5) to X8 ping
-      ansible.builtin.command: 'ping -c 4 172.30.28.1 -I 172.30.25.1'
+      ansible.builtin.command: 'ping -c 2 172.30.28.1 -I 172.30.25.1'
       changed_when: false
 
 - name: Redundant Star | Normal | Edge to Edge (routed over Center1)
@@ -68,10 +68,10 @@
   gather_facts: false
   tasks:
     - name: X7 to Center2 (X6) ping
-      ansible.builtin.command: 'ping -c 4 172.30.26.1 -I 172.30.27.1'
+      ansible.builtin.command: 'ping -c 2 172.30.26.1 -I 172.30.27.1'
       changed_when: false
     - name: X7 to X8 ping
-      ansible.builtin.command: 'ping -c 4 172.30.28.1 -I 172.30.27.1'
+      ansible.builtin.command: 'ping -c 2 172.30.28.1 -I 172.30.27.1'
       changed_when: false
 
 - name: Redundant Star | Normal | Center2 to Edges (routed over Center1)
@@ -79,53 +79,53 @@
   gather_facts: false
   tasks:
     - name: Center2 (X6) to X7 ping
-      ansible.builtin.command: 'ping -c 4 172.30.27.1 -I 172.30.26.1'
+      ansible.builtin.command: 'ping -c 2 172.30.27.1 -I 172.30.26.1'
       changed_when: false
     - name: Center2 (X6) to X8 ping
-      ansible.builtin.command: 'ping -c 4 172.30.28.1 -I 172.30.26.1'
+      ansible.builtin.command: 'ping -c 2 172.30.28.1 -I 172.30.26.1'
       changed_when: false
 
-- name: Redundant Star | Failing over
-  hosts: test-ag-wg-x5
-  gather_facts: false
-  tasks:
-    - name: Shutting down Center1 (X5)
-      community.general.shutdown:
-        delay: 1
-    - name: Waiting for shutdown to finish
-      wait_for:
-        timeout: 5
-      delegate_to: localhost
-
-- name: Redundant Star | Failover | Checking connections on redundant Star (2-3) - Center2 to Edges
-  hosts: test-ag-wg-x6
-  gather_facts: false
-  tasks:
-    - name: Center2 (X6) to X7 ping
-      ansible.builtin.command: 'ping -c 4 172.30.27.1 -I 172.30.26.1'
-      changed_when: false
-    - name: Center2 (X6) to X8 ping
-      ansible.builtin.command: 'ping -c 4 172.30.28.1 -I 172.30.26.1'
-      changed_when: false
-
-- name: Redundant Star | Failover | Edge to Edge (routed over Center2)
-  hosts: test-ag-wg-x7
-  gather_facts: false
-  tasks:
-    - name: X7 to Center2 (X6) ping
-      ansible.builtin.command: 'ping -c 4 172.30.26.1 -I 172.30.27.1'
-      changed_when: false
-    - name: X7 to X8 ping
-      ansible.builtin.command: 'ping -c 4 172.30.28.1 -I 172.30.27.1'
-      changed_when: false
+#- name: Redundant Star | Failing over
+#  hosts: test-ag-wg-x5
+#  gather_facts: false
+#  tasks:
+#    - name: Shutting down Center1 (X5)
+#      community.general.shutdown:
+#        delay: 1
+#    - name: Waiting for shutdown to finish
+#      wait_for:
+#        timeout: 5
+#      delegate_to: localhost
+#
+#- name: Redundant Star | Failover | Checking connections on redundant Star (2-3) - Center2 to Edges
+#  hosts: test-ag-wg-x6
+#  gather_facts: false
+#  tasks:
+#    - name: Center2 (X6) to X7 ping
+#      ansible.builtin.command: 'ping -c 2 172.30.27.1 -I 172.30.26.1'
+#      changed_when: false
+#    - name: Center2 (X6) to X8 ping
+#      ansible.builtin.command: 'ping -c 2 172.30.28.1 -I 172.30.26.1'
+#      changed_when: false
+#
+#- name: Redundant Star | Failover | Edge to Edge (routed over Center2)
+#  hosts: test-ag-wg-x7
+#  gather_facts: false
+#  tasks:
+#    - name: X7 to Center2 (X6) ping
+#      ansible.builtin.command: 'ping -c 2 172.30.26.1 -I 172.30.27.1'
+#      changed_when: false
+#    - name: X7 to X8 ping
+#      ansible.builtin.command: 'ping -c 2 172.30.28.1 -I 172.30.27.1'
+#      changed_when: false
 
 - name: Mesh | Edge to Edge (Auto-Routed)
   hosts: test-ag-wg-m1
   gather_facts: false
   tasks:
     - name: M1 to M2 ping
-      ansible.builtin.command: 'ping -c 4 172.30.32.1 -I 172.30.31.1'
+      ansible.builtin.command: 'ping -c 2 172.30.32.1 -I 172.30.31.1'
       changed_when: false
     - name: M1 to M3 ping
-      ansible.builtin.command: 'ping -c 4 172.30.33.1 -I 172.30.31.1'
+      ansible.builtin.command: 'ping -c 2 172.30.33.1 -I 172.30.31.1'
       changed_when: false
