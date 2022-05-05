@@ -1,0 +1,8 @@
+---
+
+# todo: add flag to allow for deb10 backports to be enabled (maybe ask user if not set)
+
+# check if kernel is new-enough
+# echo 'deb http://deb.debian.org/debian buster-backports main contrib non-free' > /etc/apt/sources.list.d/buster-backports.list
+# modprobe wireguard
+# notify: maybe a reboot is needed (error 'unknown type wireguard' on service startup)
