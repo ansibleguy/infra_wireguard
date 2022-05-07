@@ -39,12 +39,12 @@ Role to deploy WireGuard Site-to-Site VPN setups.
  
 
   * **Default opt-ins**:
-    * Installation of 'resolvconf' for name-resolution to work
     * Using PSK for additional security
     * Purging of orphaned tunnels
 
 
   * **Default opt-outs**:
+    * Installation of 'resolvconf' for name-resolution override
     * Traffic forwarding (*router-like*)
 
 
@@ -92,6 +92,11 @@ Feel free to:
   
 
 * **Info:** How to run tests is described [here](https://github.com/ansibleguy/infra_wireguard/blob/stable/molecule/default/Testing.md)
+
+
+* **Info:** The host-keys will be saved in the roles 'files' directory by default. 
+
+  This key-directory can be changed using the 'controller_key_store' variable!
 
 ----
 
@@ -141,9 +146,7 @@ wireguard:
           Address: '10.100.0.2/30'
 ```
 
-The host-keys will be saved in the roles 'files' directory.
-
-You might want to use 'ansible-vault' to encrypt those:
+You might want to use 'ansible-vault' to encrypt the host-key files:
 ```bash
 ansible-vault encrypt roles/ansibleguy.infra_wireguard/files/keys/some_file.key
 ```

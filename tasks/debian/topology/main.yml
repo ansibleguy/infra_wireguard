@@ -15,7 +15,7 @@
   tags: [tunnels, config]
 
 - ansible.builtin.set_fact:
-    psk_file: "{{ role_path }}/files/keys/{{ topo_name }}.{{ WG_HC.ext.psk }}"
+    psk_file: "{{ WG_CONFIG.controller_key_store }}/{{ topo_name }}.{{ WG_HC.ext.psk }}"
   tags: [tunnels, config]
 
 - name: "Wireguard | Debian | Topology {{ topo_name }} | Checking if psk exists on the controller"

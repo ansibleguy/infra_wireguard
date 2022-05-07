@@ -31,8 +31,9 @@ default_wg:
   topologies: {}
   purge_orphaned_tunnels: true
   path_keys: "{{ WG_HC.path_config }}/keys"
+  controller_key_store: "{{ role_path }}/files/keys"
   support:
-    dns: true
+    dns: false
     traffic_forwarding: false
   log_prefix: 'wireguard'
   restart_on_change: false  # allow the wg-services to be restarted on changes

@@ -2,7 +2,7 @@
 
 - name: "Wireguard | Debian | Topology {{ topo_name }} | Host | Copying keys to target host"
   ansible.builtin.copy:
-    src: "files/keys/{{ item }}"
+    src: "{{ WG_CONFIG.controller_key_store }}/{{ item }}"
     dest: "{{ WG_CONFIG.path_keys }}/{{ item }}"
     owner: 'root'
     group: 'root'

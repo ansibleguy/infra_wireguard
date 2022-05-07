@@ -1,8 +1,8 @@
 ---
 
 - ansible.builtin.set_fact:
-    pubkey_file: "{{ role_path }}/files/keys/{{ topo_name }}_{{ host }}.{{ WG_HC.ext.pub }}"
-    privkey_file: "{{ role_path }}/files/keys/{{ topo_name }}_{{ host }}.{{ WG_HC.ext.key }}"
+    pubkey_file: "{{ WG_CONFIG.controller_key_store }}/{{ topo_name }}_{{ host }}.{{ WG_HC.ext.pub }}"
+    privkey_file: "{{ WG_CONFIG.controller_key_store }}/{{ topo_name }}_{{ host }}.{{ WG_HC.ext.key }}"
   tags: [tunnels, config]
 
 - name: "Wireguard | Debian | Topology {{ topo_name }} | {{ host }} keys | Checking if key exist on the controller"
