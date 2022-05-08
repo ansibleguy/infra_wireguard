@@ -91,7 +91,7 @@ Feel free to:
   * mesh => wgm_
   
 
-* **Info:** How to run tests is described [here](https://github.com/ansibleguy/infra_wireguard/blob/stable/molecule/default/Testing.md)
+* **Info:** How to run tests is described [here](https://github.com/ansibleguy/infra_wireguard/blob/stable/molecule/default/Usage.md)
 
 
 * **Info:** The host-keys will be saved in the roles 'files' directory by default. 

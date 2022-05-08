@@ -1,3 +1,3 @@
 #!/bin/bash
 
-export DOCKER_HOST="tcp://172.16.111.91:2375"
+export DOCKER_HOST="tcp://172.17.0.50:2375"

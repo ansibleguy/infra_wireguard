@@ -3,7 +3,7 @@
 references:
   docker:
     all: &docker_all
-      docker_host: 'tcp://172.16.111.91:2375'
+      docker_host: 'tcp://172.17.0.50:2375'
       # docker_host: 'unix://var/run/docker.sock'  # localhost
       purge_networks: true
       image: 'debian:11-slim'
