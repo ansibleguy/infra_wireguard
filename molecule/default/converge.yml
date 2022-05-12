@@ -102,6 +102,8 @@
       restart_on_change: true
       support:
         traffic_forwarding: true
+      controller_key_store: '/tmp'
+
       topologies:
         ts1:
           type: 'single'

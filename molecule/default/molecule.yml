@@ -3,12 +3,12 @@
 references:
   docker:
     all: &docker_all
-      docker_host: 'tcp://172.17.0.50:2375'
+      docker_host: 'tcp://molecule-docker.local:2375'
       # docker_host: 'unix://var/run/docker.sock'  # localhost
       purge_networks: true
       image: 'debian:11-slim'
       # for docker systemd config see: https://serverfault.com/questions/1053187/systemd-fails-to-run-in-a-docker-container-when-using-cgroupv2-cgroupns-priva
-      dockerfile: 'Dockerfile.j2'
+      dockerfile: 'Dockerfile_debian11_systemd.j2'
       build_image: yes
       tmpfs: ['/tmp', '/run', '/run/lock']
       privileged: true
@@ -54,6 +54,7 @@ platforms:
       - name: 'test-ag-wg-s1'
         ipv4_address: '172.30.11.1'
     <<: *docker_all
+
   - name: test-ag-wg-s2
     docker_networks:
       - name: 'test-ag-wg-s2'
@@ -66,6 +67,7 @@ platforms:
       - name: 'test-ag-wg-s2'
         ipv4_address: '172.30.12.1'
     <<: *docker_all
+
   # single 2
   - name: test-ag-wg-s3
     docker_networks:
@@ -79,6 +81,7 @@ platforms:
       - name: 'test-ag-wg-s3'
         ipv4_address: '172.30.13.1'
     <<: *docker_all
+
   - name: test-ag-wg-s4
     docker_networks:
       - name: 'test-ag-wg-s4'
@@ -91,6 +94,7 @@ platforms:
       - name: 'test-ag-wg-s4'
         ipv4_address: '172.30.14.1'
     <<: *docker_all
+
   # single 3
   - name: test-ag-wg-s5
     docker_networks:
@@ -104,6 +108,7 @@ platforms:
       - name: 'test-ag-wg-s5'
         ipv4_address: '172.30.15.1'
     <<: *docker_all
+
   - name: test-ag-wg-s6
     docker_networks:
       - name: 'test-ag-wg-s6'
@@ -116,6 +121,7 @@ platforms:
       - name: 'test-ag-wg-s6'
         ipv4_address: '172.30.16.1'
     <<: *docker_all
+
   # star 1
   - name: test-ag-wg-x1
     docker_networks:
@@ -129,6 +135,7 @@ platforms:
       - name: 'test-ag-wg-x1'
         ipv4_address: '172.30.21.1'
     <<: *docker_all
+
   - name: test-ag-wg-x2
     docker_networks:
       - name: 'test-ag-wg-x2'
@@ -141,6 +148,7 @@ platforms:
       - name: 'test-ag-wg-x2'
         ipv4_address: '172.30.22.1'
     <<: *docker_all
+
   - name: test-ag-wg-x3
     docker_networks:
       - name: 'test-ag-wg-x3'
@@ -153,6 +161,7 @@ platforms:
       - name: 'test-ag-wg-x3'
         ipv4_address: '172.30.23.1'
     <<: *docker_all
+
   - name: test-ag-wg-x4
     docker_networks:
       - name: 'test-ag-wg-x4'
@@ -165,6 +174,7 @@ platforms:
       - name: 'test-ag-wg-x4'
         ipv4_address: '172.30.24.1'
     <<: *docker_all
+
   # star 2-3 (redundant)
   - name: test-ag-wg-x5
     docker_networks:
@@ -178,6 +188,7 @@ platforms:
       - name: 'test-ag-wg-x5'
         ipv4_address: '172.30.25.1'
     <<: *docker_all
+
   - name: test-ag-wg-x6
     docker_networks:
       - name: 'test-ag-wg-x6'
@@ -190,6 +201,7 @@ platforms:
       - name: 'test-ag-wg-x6'
         ipv4_address: '172.30.26.1'
     <<: *docker_all
+
   - name: test-ag-wg-x7
     docker_networks:
       - name: 'test-ag-wg-x7'
@@ -202,6 +214,7 @@ platforms:
       - name: 'test-ag-wg-x7'
         ipv4_address: '172.30.27.1'
     <<: *docker_all
+
   - name: test-ag-wg-x8
     docker_networks:
       - name: 'test-ag-wg-x8'
@@ -214,6 +227,7 @@ platforms:
       - name: 'test-ag-wg-x8'
         ipv4_address: '172.30.28.1'
     <<: *docker_all
+
   # mesh
   - name: test-ag-wg-m1
     docker_networks:
@@ -227,6 +241,7 @@ platforms:
       - name: 'test-ag-wg-m1'
         ipv4_address: '172.30.31.1'
     <<: *docker_all
+
   - name: test-ag-wg-m2
     docker_networks:
       - name: 'test-ag-wg-m2'
@@ -239,6 +254,7 @@ platforms:
       - name: 'test-ag-wg-m2'
         ipv4_address: '172.30.32.1'
     <<: *docker_all
+
   - name: test-ag-wg-m3
     docker_networks:
       - name: 'test-ag-wg-m3'

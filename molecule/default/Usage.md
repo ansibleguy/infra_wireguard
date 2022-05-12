@@ -6,12 +6,12 @@ You may want to use a remote docker server.
 
 # Usage
 
-Check out my [Molecule Tutorial](https://github.com/ansibleguy/ansible_tutorial/blob/main/Molecule.md) on how to get started!
+Check out the [Molecule Tutorial](https://github.com/ansibleguy/ansible_tutorial/blob/main/Molecule.md) on how to get started!
 
 # Running
 
 ```bash
-cd ansibleguy.infra_wireguard
+cd roles/ansibleguy.infra_wireguard
 # to run build the test instances, run the tests and clean up afterwards
 molecule test
 

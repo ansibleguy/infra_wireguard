@@ -13,15 +13,6 @@
   strategy: free  # speed-up
   gather_facts: no
   tasks:
-    - name: Writing vault password to file
-      ansible.builtin.copy:
-        content: "{{ lookup('env', 'VAULT_PASS') | default('none', True) }}"
-        dest: '/tmp/.molecule.vault'
-        mode: 0600
-      delegate_to: localhost
-      run_once: true
-      become: false
-
     - name: Installing dependencies
       ansible.builtin.apt:
         pkg: ['iputils-ping', 'ufw', 'iproute2']
