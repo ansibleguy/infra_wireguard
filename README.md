@@ -28,7 +28,6 @@ Role to deploy WireGuard Site-to-Site VPN setups.
     * Keys are written to the controller for consistency
   * **Routing**
     * The routing is **up to you to manage**! You could enable the auto-added WG routes or add custom up-/down-scripts.
-    * We might add dynamic routing using [THIS](https://github.com/ansibleguy/infra_dynamic_routing) role later on.
 
 
   * **Default config**:

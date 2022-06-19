@@ -15,8 +15,7 @@ Table = off
 Table = {{ wg_local.Table }}
 PostUp = if ! ip rule show | grep -q '{{ wg_local.Table }}';then ip rule add to all lookup {{ wg_local.Table }}{% if wg_local.TablePref != ''%} pref {{ wg_local.TablePref }}{% endif %};fi
 {% elif wg_local.Route or topology.Route %}
-Table = {{ WG_HC.default_routing_table }}
-PostUp = if ! ip rule show | grep -q '{{ WG_HC.default_routing_table }}';then ip rule add to all lookup {{ WG_HC.default_routing_table }};fi
+# no routing table provided; using defaults
 {% else %}
 Table = off
 {% endif %}
