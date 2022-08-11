@@ -1,0 +1,27 @@
+---
+
+WG_HC:
+  path_config: '/etc/wireguard'
+  default_port: 51820
+  ext:
+    key: 'key'
+    pub: 'pub'
+    psk: 'psk'
+
+  sysctl:
+    forwarding:
+      enable:
+        'net.ipv4.ip_forward': 1
+        'net.ipv4.conf.all.arp_filter': 0
+        'net.ipv4.conf.all.rp_filter': 2
+      disable:
+        'net.ipv4.ip_forward': 0
+
+  packages: ['systemd', 'iproute2', 'wireguard']
+
+  default_routing_table: 1000
+  default_routing_metric: 100
+  default_keepalive: 25
+  log_output_lines: 10
+  wg_svc: 'wg-quick'
+  controller_required_mods: ['netaddr']

@@ -66,7 +66,7 @@
   when: inventory_hostname == host
   vars:
     host: "{{ host_item.key }}"
-    wg_local: "{{ default_local_config | combine(host_item.value, recursive=true) }}"
+    wg_local: "{{ defaults_local | combine(host_item.value, recursive=true) }}"
   loop_control:
     loop_var: host_item
   with_dict: "{{ topology.peers }}"

@@ -1,33 +1,7 @@
 ---
 
-WG_HC:
-  path_config: '/etc/wireguard'
-  default_port: 51820
-  ext:
-    key: 'key'
-    pub: 'pub'
-    psk: 'psk'
-
-  sysctl:
-    forwarding:
-      enable:
-        'net.ipv4.ip_forward': 1
-        'net.ipv4.conf.all.arp_filter': 0
-        'net.ipv4.conf.all.rp_filter': 2
-      disable:
-        'net.ipv4.ip_forward': 0
-
-  packages: ['systemd', 'iproute2', 'wireguard']
-
-  default_routing_table: 1000
-  default_routing_metric: 100
-  default_keepalive: 25
-  log_output_lines: 10
-  wg_svc: 'wg-quick'
-  controller_required_mods: ['netaddr']
-
 # default config => is overwritten by provided config
-default_wg:
+defaults_wg:
   topologies: {}
   purge_orphaned_tunnels: true
   path_keys: "{{ WG_HC.path_config }}/keys"
@@ -43,17 +17,18 @@ default_wg:
     star: 'wgx'
     mesh: 'wgm'
   dynamic_contact_sleep: 120
+  debug: false  # enable debug mode until reboot
 
-WG_CONFIG: "{{ default_wg | combine(wireguard, recursive=true) }}"
+WG_CONFIG: "{{ defaults_wg | combine(wireguard, recursive=true) }}"
 
-default_topology_config:
+defaults_topology:
   type: 'single'  # single/star/mesh
   peers: {}
   psk: true
   NATed: false  # alternative switch to enable keepalive topology-wide
   Route: false  # alternative switch to auto-add routes topology-wide
 
-default_local_config:
+defaults_local:
   peers: {}
   ListenPort: "{{ WG_HC.default_port }}"
   Address: ['']
@@ -61,7 +36,7 @@ default_local_config:
   DNS:
     - '1.1.1.1'
     - '8.8.8.8'
-  MTU: 1500
+  MTU: 1420
   PreUp: []
   PostUp: []
   PreDown: []
@@ -77,7 +52,7 @@ default_local_config:
   NATed: false  # alternative switch to enable keepalive
   role: 'edge'  # center/edge
 
-default_peer_config:
+defaults_peer:
   Endpoint: ''
   ListenPort: "{{ WG_HC.default_port }}"
   AllowedIPs:
