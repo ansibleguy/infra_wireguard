@@ -2,6 +2,7 @@
 
 galaxy_info:
   author: 'AnsibleGuy <guy@ansibleguy.net>'
+  namespace: 'ansibleguy'
   readme: 'README.md'
   license: 'GPLv3'
   repository: 'https://github.com/ansibleguy/infra_wireguard'
