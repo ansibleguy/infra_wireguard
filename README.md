@@ -70,7 +70,9 @@ Feel free to:
 * **Note:** this role currently only supports debian-based systems
 
 
-* **Note:** Most of this functionality can be opted in or out using the main defaults file and variables!
+* **Note:** Most of the role's functionality can be opted in or out.
+
+  For all available options - see the default-config located in the main defaults-file!
 
 
 * **Warning:** Not every setting/variable you provide will be checked for validity. Bad config might break the role!
