@@ -67,6 +67,20 @@
   when: not WG_CONFIG.support.traffic_forwarding
   tags: [base]
 
+- name: Wireguard | Debian | Enabling dynamic debug
+  ansible.builtin.command:
+    cmd: 'tee /sys/kernel/debug/dynamic_debug/control'
+    stdin: 'module wireguard +p'
+  when: WG_CONFIG.debug
+  changed_when: false
+
+- name: Wireguard | Debian | Disabling dynamic debug
+  ansible.builtin.command:
+    cmd: 'tee /sys/kernel/debug/dynamic_debug/control'
+    stdin: 'module wireguard -p'
+  when: not WG_CONFIG.debug
+  changed_when: false
+
 - name: Wireguard | Debian | Creating directories
   ansible.builtin.file:
     path: "{{ item }}"
@@ -84,6 +98,7 @@
   ansible.builtin.template:
     src: 'templates/etc/systemd/system/wg-quick@.service.d/override.conf.j2'
     dest: "/etc/systemd/system/{{ WG_HC.wg_svc }}@.service.d/override.conf"
+    mode: 0644
   tags: [base, config]
 
 - name: Wireguard | Debian | Purging tunnels
@@ -98,7 +113,7 @@
     - only_topo is undefined or only_topo == name
   vars:
     topo_name: "{{ topo_item.key | safe_int_name }}"
-    topology: "{{ default_topology_config | combine(topo_item.value, recursive=true) }}"
+    topology: "{{ defaults_topology | combine(topo_item.value, recursive=true) }}"
   loop_control:
     loop_var: topo_item
   with_dict: "{{ WG_CONFIG.topologies }}"

@@ -9,6 +9,7 @@
   check_mode: false
   changed_when: false
   register: wg_svc_loaded
+  tags: [skip_ansible_lint]
 
 - name: Wireguard | Debian | Purge | Stopping & Disabling tunnel-service
   ansible.builtin.systemd:
@@ -28,6 +29,7 @@
   when:
     - wg_svc_removal.changed is defined
     - wg_svc_removal.changed
+  tags: [skip_ansible_lint]  # does not work with module
 
 # grepping as I found no way of filtering '.conf.swp' using find's 'name'-filter
 - name: Wireguard | Debian | Purge | Getting list of current configured tunnels

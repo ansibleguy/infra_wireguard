@@ -6,4 +6,4 @@ rules:
   truthy:
     allowed-values: ['true', 'false', 'yes', 'no']
   line-length:
-    max: 150
+    max: 160
