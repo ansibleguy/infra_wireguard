@@ -2,6 +2,6 @@
 {# custom implementation of auto-added routes for topologies where a gateway is needed #}
 # auto-routes
 {% for peer_name, raw_peer in wg_peers.items() %}
-{%   set wg_peer = default_peer_config | combine(raw_peer, recursive=true) %}
+{%   set wg_peer = defaults_peer | combine(raw_peer, recursive=true) %}
 {%   include "inc/routing.conf.j2" %}
 {% endfor %}

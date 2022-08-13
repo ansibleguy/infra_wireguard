@@ -275,8 +275,8 @@ guy@rando:~# cat /etc/wireguard/wgm_dcs.conf
 > PostUp = ip route add 172.30.32.0/24 dev %i metric 101 via 10.0.3.2
 >
 > # get dynamic endpoint to re-/connect
-> PostUp = /bin/bash -c "while sleep 120 ; do ping -c4 10.0.3.1 > /dev/null 2>&1 ; done &"
-> PostUp = /bin/bash -c "while sleep 120 ; do ping -c4 10.0.3.2 > /dev/null 2>&1 ; done &"
+> PostUp = /bin/bash -c "while sleep 30 ; do ping -c4 10.0.3.1 > /dev/null 2>&1 ; done &"
+> PostUp = /bin/bash -c "while sleep 30 ; do ping -c4 10.0.3.2 > /dev/null 2>&1 ; done &"
 >
 > [Peer]
 > # aws

@@ -73,6 +73,7 @@
     stdin: 'module wireguard +p'
   when: WG_CONFIG.debug
   changed_when: false
+  ignore_errors: true
 
 - name: Wireguard | Debian | Disabling dynamic debug
   ansible.builtin.command:
@@ -80,6 +81,7 @@
     stdin: 'module wireguard -p'
   when: not WG_CONFIG.debug
   changed_when: false
+  ignore_errors: true
 
 - name: Wireguard | Debian | Creating directories
   ansible.builtin.file:

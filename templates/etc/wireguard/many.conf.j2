@@ -14,16 +14,16 @@
 {% if wg_local.Endpoint is undefined or wg_local.Endpoint == '' %}
 # get dynamic endpoint to re-/connect
 {%   for raw_peer in wg_peers.values() %}
-{%     set wg_peer = default_peer_config | combine(raw_peer, recursive=true) %}
+{%     set wg_peer = defaults_peer | combine(raw_peer, recursive=true) %}
 {%     include "inc/dynamic.conf.j2" %}
 {%   endfor %}
 {% endif %}
 
 {% for peer_name, raw_peer in wg_peers.items() %}
-{%   set wg_peer = default_peer_config | combine(raw_peer, recursive=true) %}
+{%   set wg_peer = defaults_peer | combine(raw_peer, recursive=true) %}
 {%   set peer_pubkey_file = role_path + '/files/keys/' + topo_name + '_' + peer_name + '.' + WG_HC.ext.pub %}
 {%   include "inc/peer.conf.j2" %}
-{%   if wg_peer.AllowedIPs == default_peer_config.AllowedIPs %}
+{%   if wg_peer.AllowedIPs == defaults_peer.AllowedIPs %}
 # WARN: using non-specific remote networks for star-center & mesh WILL NOT WORK properly!
 {%   endif %}
 

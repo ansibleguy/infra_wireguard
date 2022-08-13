@@ -275,7 +275,7 @@ guy@srv07:~# cat /etc/wireguard/wgx_dc_nl.conf
 > DNS = 1.1.1.1, 8.8.8.8
 > 
 > # get dynamic endpoint to re-/connect
-> PostUp = /bin/bash -c "while sleep 120 ; do ping -c4 10.100.10.3 > /dev/null 2>&1 ; done &"
+> PostUp = /bin/bash -c "while sleep 30 ; do ping -c4 10.100.10.3 > /dev/null 2>&1 ; done &"
 >
 > [Peer]
 > PublicKey = BkxQWjX6k1QxP75uRxnFjCWOozNR9dJEQaWiPcXBDzE=

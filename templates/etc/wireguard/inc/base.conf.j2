@@ -1,7 +1,7 @@
 [Interface]
 Address = {% for ip in wg_local.Address | ensure_list %}{{ ip }}{% if not loop.last %}, {% endif %}{% endfor %}
 
-{% if wg_local.ListenPort == default_local_config.ListenPort and 'ListenPort' in topology %}
+{% if wg_local.ListenPort == defaults_local.ListenPort and 'ListenPort' in topology %}
 ListenPort = {{ topology.ListenPort }}
 {% elif wg_local.ListenPort %}
 ListenPort = {{ wg_local.ListenPort }}
@@ -19,7 +19,7 @@ PostUp = if ! ip rule show | grep -q '{{ wg_local.Table }}';then ip rule add to 
 {% else %}
 Table = off
 {% endif %}
-{% if wg_local.DNS not in ['', ' ', none] and wg_local.DNS | length > 0 %}
+{% if wg_local.DNS not in ['', ' ', none] and wg_local.DNS | length > 0 and WG_CONFIG.support.dns %}
 DNS = {% for dns in wg_local.DNS | ensure_list %}{{ dns }}{% if not loop.last %}, {% endif %}{% endfor %}
 
 {% endif %}

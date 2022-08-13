@@ -21,7 +21,7 @@ WG_HC:
 
   default_routing_table: 1000
   default_routing_metric: 100
-  default_keepalive: 25
+  default_keepalive: 5
   log_output_lines: 10
   wg_svc: 'wg-quick'
   controller_required_mods: ['netaddr']

@@ -12,6 +12,7 @@ Role to deploy WireGuard Site-to-Site VPN setups.
 
 **Tested:**
 * Debian 11
+* Raspbian 11
 
 ## Functionality
 
