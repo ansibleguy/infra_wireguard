@@ -85,39 +85,39 @@
       ansible.builtin.command: 'ping -c 2 172.30.28.1 -I 172.30.26.1'
       changed_when: false
 
-#- name: Redundant Star | Failing over
-#  hosts: test-ag-wg-x5
-#  gather_facts: false
-#  tasks:
-#    - name: Shutting down Center1 (X5)
-#      community.general.shutdown:
-#        delay: 1
-#    - name: Waiting for shutdown to finish
-#      wait_for:
-#        timeout: 5
-#      delegate_to: localhost
+#  - name: Redundant Star | Failing over
+#    hosts: test-ag-wg-x5
+#    gather_facts: false
+#    tasks:
+#      - name: Shutting down Center1 (X5)
+#        community.general.shutdown:
+#          delay: 1
+#      - name: Waiting for shutdown to finish
+#        wait_for:
+#          timeout: 5
+#        delegate_to: localhost
 #
-#- name: Redundant Star | Failover | Checking connections on redundant Star (2-3) - Center2 to Edges
-#  hosts: test-ag-wg-x6
-#  gather_facts: false
-#  tasks:
-#    - name: Center2 (X6) to X7 ping
-#      ansible.builtin.command: 'ping -c 2 172.30.27.1 -I 172.30.26.1'
-#      changed_when: false
-#    - name: Center2 (X6) to X8 ping
-#      ansible.builtin.command: 'ping -c 2 172.30.28.1 -I 172.30.26.1'
-#      changed_when: false
+#  - name: Redundant Star | Failover | Checking connections on redundant Star (2-3) - Center2 to Edges
+#    hosts: test-ag-wg-x6
+#    gather_facts: false
+#    tasks:
+#      - name: Center2 (X6) to X7 ping
+#        ansible.builtin.command: 'ping -c 2 172.30.27.1 -I 172.30.26.1'
+#        changed_when: false
+#      - name: Center2 (X6) to X8 ping
+#        ansible.builtin.command: 'ping -c 2 172.30.28.1 -I 172.30.26.1'
+#        changed_when: false
 #
-#- name: Redundant Star | Failover | Edge to Edge (routed over Center2)
-#  hosts: test-ag-wg-x7
-#  gather_facts: false
-#  tasks:
-#    - name: X7 to Center2 (X6) ping
-#      ansible.builtin.command: 'ping -c 2 172.30.26.1 -I 172.30.27.1'
-#      changed_when: false
-#    - name: X7 to X8 ping
-#      ansible.builtin.command: 'ping -c 2 172.30.28.1 -I 172.30.27.1'
-#      changed_when: false
+#  - name: Redundant Star | Failover | Edge to Edge (routed over Center2)
+#    hosts: test-ag-wg-x7
+#    gather_facts: false
+#    tasks:
+#      - name: X7 to Center2 (X6) ping
+#        ansible.builtin.command: 'ping -c 2 172.30.26.1 -I 172.30.27.1'
+#        changed_when: false
+#      - name: X7 to X8 ping
+#        ansible.builtin.command: 'ping -c 2 172.30.28.1 -I 172.30.27.1'
+#        changed_when: false
 
 - name: Mesh | Edge to Edge (Auto-Routed)
   hosts: test-ag-wg-m1
