@@ -1,7 +1,5 @@
 ---
 
----
-
 skip_list:
   - 'var-naming'
   - 'no-handler'
