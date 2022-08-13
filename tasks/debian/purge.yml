@@ -48,7 +48,7 @@
   failed_when: false
   when:
     - "existing_int | replace('.conf','') not in wg_wanted_ints"
-    - existing_int | replace('.conf','') != ''
+    - existing_int | replace('.conf','')
   loop_control:
     loop_var: existing_int
   loop: "{{ wg_existing_ints.stdout_lines }}"

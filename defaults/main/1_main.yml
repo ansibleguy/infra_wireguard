@@ -46,7 +46,7 @@ defaults_local:
   # if you do so, you will most probably need to modify your peers 'AllowedIPs' or lock yourself out (;
   TablePref: ''
   # set to number between 1 and 32765 as a preference for the given routing table
-  # cmd: "ip rule add to all lookup {{ wg_local.Table }}{% if wg_local.TablePref != ''%} pref {{ wg_local.TablePref }}"
+  # cmd: "ip rule add to all lookup {{ wg_local.Table }}{% if wg_local.TablePref %} pref {{ wg_local.TablePref }}"
   # cmd del: "ip route del prio {{ wg_local.TablePref }}"
   Route: false  # alternative switch to auto-add routes
   NATed: false  # alternative switch to enable keepalive
