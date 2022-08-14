@@ -93,7 +93,7 @@
 #        community.general.shutdown:
 #          delay: 1
 #      - name: Waiting for shutdown to finish
-#        wait_for:
+#        ansible.builtin.wait_for:
 #          timeout: 5
 #        delegate_to: localhost
 #
