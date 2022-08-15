@@ -5,6 +5,11 @@
 Documentation=https://github.com/ansibleguy/infra_wireguard
 
 [Service]
+{% if ansible_distribution_version == '10' %}
+StandardOutput=syslog
+StandardError=syslog
+{% else %}
 StandardOutput=journal
 StandardError=journal
+{% endif %}
 SyslogIdentifier={{ WG_CONFIG.log_prefix }}_%i
