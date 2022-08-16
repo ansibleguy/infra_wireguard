@@ -1,0 +1,5 @@
+---
+
+# used only by test
+collections:
+  - name: 'community.general'

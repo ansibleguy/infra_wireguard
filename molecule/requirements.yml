@@ -1,6 +1,0 @@
----
-# external roles and collections to download
-# install: ansible-galaxy install -r requirements.yml
-
-collections:
-  - name: 'community.general'

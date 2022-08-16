@@ -25,6 +25,8 @@ references:
 
 dependency:
   name: galaxy
+  options:
+    requirements-file: dependencies.yml
 driver:
   name: docker
 platforms:
