@@ -103,6 +103,9 @@ Feel free to:
 
   This key-directory can be changed using the 'controller_key_store' variable!
 
+
+* **Info:** If you are using **OPNSense firewalls** - you can use the [ansibleguy.opnsense Ansible collection](https://github.com/ansibleguy/collection_opnsense/blob/stable/docs/use_wireguard.md) to manage those WireGuard tunnels.
+
 ----
 
 ## Setup
