@@ -33,11 +33,6 @@ The prefix 'wgm_' will be prepended for interfaces of the topology 'mesh'.
 This prefix and much more can be changed as provided.
 
 ```yaml
-# to reference networks
-dc_networks:
-  aws:
-
-# vpn config
 wireguard:
   restart_on_change: true
   support:
