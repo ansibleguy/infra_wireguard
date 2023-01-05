@@ -43,7 +43,7 @@
 
 # if service does not exist but wg-instance is still running.. after config-removal it's harder to kill
 - name: Wireguard | Debian | Purge | Stopping orphaned tunnel
-  ansible.builtin.command: "wg-quick down {{ existing_int | replace('.conf','') }}"
+  ansible.builtin.command: "wg-quick down {{ existing_int | replace('.conf', '') }}"
   ignore_errors: true
   failed_when: false
   when:
