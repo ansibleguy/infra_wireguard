@@ -21,7 +21,7 @@
 
 {% for peer_name, raw_peer in wg_peers.items() %}
 {%   set wg_peer = defaults_peer | combine(raw_peer, recursive=true) %}
-{%   set peer_pubkey_file = role_path + '/files/keys/' + topo_name + '_' + peer_name + '.' + WG_HC.ext.pub %}
+{%   set peer_pubkey_file = WG_CONFIG.controller_key_store + '/' + topo_name + '_' + peer_name + '.' + WG_HC.ext.pub %}
 {%   include "inc/peer.conf.j2" %}
 {%   if wg_peer.AllowedIPs == defaults_peer.AllowedIPs %}
 # WARN: using non-specific remote networks for star-center & mesh WILL NOT WORK properly!

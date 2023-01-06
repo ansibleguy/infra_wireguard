@@ -53,7 +53,9 @@
     state: present
     reload: yes
   with_dict: "{{ WG_HC.sysctl.forwarding.enable }}"
-  when: WG_CONFIG.support.traffic_forwarding
+  when:
+    - WG_CONFIG.support.traffic_forwarding
+    - "'docker' not in ansible_virtualization_tech_guest"
   tags: [base]
 
 - name: Wireguard | Debian | Configuring sysctl to dis-allow traffic forwarding
@@ -64,7 +66,9 @@
     state: present
     reload: yes
   with_dict: "{{ WG_HC.sysctl.forwarding.disable }}"
-  when: not WG_CONFIG.support.traffic_forwarding
+  when:
+    - not WG_CONFIG.support.traffic_forwarding
+    - "'docker' not in ansible_virtualization_tech_guest"
   tags: [base]
 
 - name: Wireguard | Debian | Enabling dynamic debug
