@@ -113,6 +113,10 @@ Feel free to:
 For this role to work - you must install its dependencies first: (*on the controller*)
 
 ```
+ansible-galaxy install -r requirements.yml
+```
+
+```
 pip install netaddr
 ```
 
