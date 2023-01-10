@@ -1,13 +1,5 @@
 ---
 
-- name: Wait
-  hosts: localhost
-  tasks:
-    - name: Waiting some seconds else it might kill one of the instances
-      ansible.builtin.pause:
-        seconds: 5
-      delegate_to: localhost
-
 - name: Prepare
   hosts: all
   strategy: free  # speed-up

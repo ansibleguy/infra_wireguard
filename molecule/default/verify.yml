@@ -1,5 +1,15 @@
 ---
 
+- name: Waiting
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Waiting some seconds for tunnels to connect
+      ansible.builtin.pause:
+        seconds: 60
+      delegate_to: localhost
+      run_once: true
+
 - name: Single | Check
   hosts: test-ag-wg-s1
   gather_facts: false
