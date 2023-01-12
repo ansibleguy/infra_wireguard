@@ -14,6 +14,20 @@ Role to deploy WireGuard Site-to-Site VPN setups.
 * Debian 11
 * Raspbian 11
 
+## Install
+
+```bash
+ansible-galaxy install ansibleguy.infra_wireguard
+
+# or to custom role-path
+ansible-galaxy install ansibleguy.infra_wireguard --roles-path ./roles
+
+# install dependencies
+ansible-galaxy install -r requirements.yml
+```
+
+----
+
 ## Functionality
 
 * **Package installation**
@@ -105,20 +119,6 @@ Feel free to:
 
 
 * **Info:** If you are using **OPNSense firewalls** - you can use the [ansibleguy.opnsense Ansible collection](https://github.com/ansibleguy/collection_opnsense/blob/stable/docs/use_wireguard.md) to manage those WireGuard tunnels.
-
-----
-
-## Setup
-
-For this role to work - you must install its dependencies first: (*on the controller*)
-
-```
-ansible-galaxy install -r requirements.yml
-```
-
-```
-pip install netaddr
-```
 
 ----
 
