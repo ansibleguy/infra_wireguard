@@ -14,9 +14,9 @@
   hosts: test-ag-wg-s1
   gather_facts: false
   tasks:
-  - name: S1 to S2 ping
-    ansible.builtin.command: 'ping -c 2 172.30.12.1 -I 172.30.11.1'
-    changed_when: false
+    - name: S1 to S2 ping
+      ansible.builtin.command: 'ping -c 2 172.30.12.1 -I 172.30.11.1'
+      changed_when: false
 
 - name: Single Auto-Routed | Check
   hosts: test-ag-wg-s3
