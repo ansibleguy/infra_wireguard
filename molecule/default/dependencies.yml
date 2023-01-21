@@ -2,4 +2,4 @@
 
 # used only by test
 collections:
-  - name: 'community.general'
+  - 'community.general'
