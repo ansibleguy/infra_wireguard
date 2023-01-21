@@ -1,5 +1,4 @@
 ---
 
-# used only by test
 collections:
   - 'community.general'
