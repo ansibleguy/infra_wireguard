@@ -26,7 +26,7 @@ class FilterModule(object):
         hosts = []
 
         for v in topologies.values():
-            hosts.extend([peer for peer in v['peers'].keys()])
+            hosts.extend(list(v['peers'].keys()))
 
         return hosts
 
@@ -79,18 +79,17 @@ class FilterModule(object):
     @staticmethod
     def ensure_list(data: (str, list)) -> list:
         # if user supplied a string instead of a list => convert it to match our expectations
-        if type(data) == list:
+        if isinstance(data, list):
             return data
 
-        else:
-            return [data]
+        return [data]
 
     @staticmethod
     def write_keys(pub: str, file_pub: str, pk: str, file_pk: str) -> bool:
         # to solve race condition (pk and pub not from same 'run')
         if not os_path.exists(file_pub) and not os_path.exists(file_pk):
-            with open(file_pub, 'w') as fpub:
-                with open(file_pk, 'w') as fpk:
+            with open(file_pub, 'w', encoding='utf-8') as fpub:
+                with open(file_pk, 'w', encoding='utf-8') as fpk:
                     fpub.write(pub)
                     fpk.write(pk)
                     return True
@@ -99,4 +98,4 @@ class FilterModule(object):
 
     @staticmethod
     def all_exist(data: list) -> bool:
-        return all([result['stat']['exists'] for result in data])
+        return all(result['stat']['exists'] for result in data)
