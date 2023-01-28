@@ -125,3 +125,6 @@
   with_dict: "{{ WG_CONFIG.topologies }}"
   no_log: true
   tags: [purge, tunnels, config]
+  args:
+    apply:
+      tags: [purge, tunnels, config]

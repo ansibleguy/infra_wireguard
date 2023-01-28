@@ -26,3 +26,6 @@
 - name: "Wireguard | Debian | Topology {{ topo_name }} | Star-Edge | Tunnel | Adding service"
   ansible.builtin.include_tasks: service.yml
   tags: [tunnels, config]
+  args:
+    apply:
+      tags: [tunnels, config]

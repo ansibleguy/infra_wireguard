@@ -20,6 +20,9 @@
     int_name: "{{ WG_CONFIG.int_prefix.single + '_' + topo_name | safe_int_name }}"
   when: topology.type == 'single'
   tags: [tunnels, config]
+  args:
+    apply:
+      tags: [tunnels, config]
 
 - name: "Wireguard | Debian | Topology {{ topo_name }} | Host | Configuring tunnel for topology 'star'"
   ansible.builtin.include_tasks: tunnel/star.yml
@@ -28,6 +31,9 @@
     int_name: "{{ WG_CONFIG.int_prefix.star + '_' + topo_name | safe_int_name }}"
   when: topology.type == 'star'
   tags: [tunnels, config]
+  args:
+    apply:
+      tags: [tunnels, config]
 
 - name: "Wireguard | Debian | Topology {{ topo_name }} | Host | Configuring tunnel for topology 'star'"
   ansible.builtin.include_tasks: tunnel/mesh.yml
@@ -36,3 +42,6 @@
     int_name: "{{ WG_CONFIG.int_prefix.mesh + '_' + topo_name | safe_int_name }}"
   when: topology.type == 'mesh'
   tags: [tunnels, config]
+  args:
+    apply:
+      tags: [tunnels, config]

@@ -4,12 +4,21 @@
   ansible.builtin.include_tasks: star_center.yml
   when: wg_local.role == 'center'
   tags: [tunnels, config]
+  args:
+    apply:
+      tags: [tunnels, config]
 
 - name: "Wireguard | Debian | Topology {{ topo_name }} | Star | Tunnel | Adding edge-config"
   ansible.builtin.include_tasks: star_edge.yml
   when: wg_local.role != 'center'
   tags: [tunnels, config]
+  args:
+    apply:
+      tags: [tunnels, config]
 
 - name: "Wireguard | Debian | Topology {{ topo_name }} | Star | Tunnel | Adding service"
   ansible.builtin.include_tasks: service.yml
   tags: [tunnels, config]
+  args:
+    apply:
+      tags: [tunnels, config]
