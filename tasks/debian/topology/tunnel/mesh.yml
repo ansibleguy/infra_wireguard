@@ -1,5 +1,12 @@
 ---
 
+- name: "Wireguard | Debian | Topology {{ topo_name }} | Mesh | Tunnel | Checking config"
+  ansible.builtin.include_tasks: check.yml
+  tags: [tunnels, config]
+  args:
+    apply:
+      tags: [tunnels, config]
+
 - name: "Wireguard | Debian | Topology {{ topo_name }} | Mesh | Tunnel | Building mesh-config"
   ansible.builtin.set_fact:
     wg_peers: "{{ topology.peers | mesh_peers(inventory_hostname) }}"

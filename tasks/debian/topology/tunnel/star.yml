@@ -1,5 +1,12 @@
 ---
 
+- name: "Wireguard | Debian | Topology {{ topo_name }} | Star | Tunnel | Checking config"
+  ansible.builtin.include_tasks: check.yml
+  tags: [tunnels, config]
+  args:
+    apply:
+      tags: [tunnels, config]
+
 - name: "Wireguard | Debian | Topology {{ topo_name }} | Star | Tunnel | Adding center-config"
   ansible.builtin.include_tasks: star_center.yml
   when: wg_local.role == 'center'

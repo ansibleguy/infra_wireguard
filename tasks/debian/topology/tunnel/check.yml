@@ -1,0 +1,6 @@
+---
+
+- name: "Wireguard | Debian | Topology {{ topo_name }} | Tunnel | Check | Checking config"
+  ansible.builtin.assert:
+    that:
+      - int_name | length < 16  # interface-length limitation
