@@ -1,5 +1,6 @@
 ---
 
+# todo: '_references' key is not allowed in molecule>4.0.1 schema-validation..
 _references:
   docker:
     all: &docker_all
