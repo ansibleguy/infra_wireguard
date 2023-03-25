@@ -46,6 +46,7 @@
   ansible.builtin.command: "wg-quick down {{ existing_int | replace('.conf', '') }}"
   ignore_errors: true
   failed_when: false
+  changed_when: false
   when:
     - "existing_int | replace('.conf','') not in wg_wanted_ints"
     - existing_int | replace('.conf','')
