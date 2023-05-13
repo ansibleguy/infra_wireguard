@@ -25,6 +25,7 @@ ansible-galaxy install ansibleguy.infra_wireguard --roles-path ./roles
 
 # install dependencies
 ansible-galaxy install -r requirements.yml
+python3 -m pip install -r requirements.txt
 ```
 
 ----
