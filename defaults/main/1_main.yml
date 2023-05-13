@@ -19,8 +19,6 @@ defaults_wg:
   dynamic_contact_sleep: 30
   debug: false  # enable debug mode until reboot
 
-WG_CONFIG: "{{ defaults_wg | combine(wireguard, recursive=true) }}"
-
 defaults_topology:
   type: 'single'  # single/star/mesh
   peers: {}

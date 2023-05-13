@@ -1,0 +1,3 @@
+---
+
+WG_CONFIG: "{{ defaults_wg | combine(wireguard, recursive=true) }}"
