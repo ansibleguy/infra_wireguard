@@ -1,17 +1,17 @@
 ---
 
-- name: Wireguard | Debian | Purge | Getting list of tunnels that should exist
+- name: Wireguard | Purge | Getting list of tunnels that should exist
   ansible.builtin.set_fact:
     wg_wanted_ints: "{{ wireguard.topologies | flatten_ints(inventory_hostname, WG_CONFIG.int_prefix) }}"
 
-- name: Wireguard | Debian | Purge | Getting list of all enabled tunnel-services
+- name: Wireguard | Purge | Getting list of all enabled tunnel-services
   ansible.builtin.shell: "systemctl list-units --state=loaded --full --no-pager | grep {{ WG_HC.wg_svc }}@ | cut -d ' ' -f3"
   check_mode: false
   changed_when: false
   register: wg_svc_loaded
   tags: [skip_ansible_lint]
 
-- name: Wireguard | Debian | Purge | Stopping & Disabling tunnel-service
+- name: Wireguard | Purge | Stopping & Disabling tunnel-service
   ansible.builtin.systemd:
     name: "{{ loaded_svc }}"
     enabled: false
@@ -24,7 +24,7 @@
     loop_var: loaded_svc
   loop: "{{ wg_svc_loaded.stdout_lines }}"
 
-- name: Wireguard | Debian | Purge | Removing non-existing tunnel-service-instances
+- name: Wireguard | Purge | Removing non-existing tunnel-service-instances
   ansible.builtin.command: 'systemctl reset-failed'
   when:
     - wg_svc_removal.changed is defined
@@ -32,7 +32,7 @@
   tags: [skip_ansible_lint]  # does not work with module
 
 # grepping as I found no way of filtering '.conf.swp' using find's 'name'-filter
-- name: Wireguard | Debian | Purge | Getting list of current configured tunnels
+- name: Wireguard | Purge | Getting list of current configured tunnels
   ansible.builtin.shell: "find {{ WG_HC.path_config }} -maxdepth 1 -type f -printf '%f\n' | grep '.conf$'"
   register: wg_existing_ints
   check_mode: false
@@ -42,7 +42,7 @@
   no_log: true
 
 # if service does not exist but wg-instance is still running.. after config-removal it's harder to kill
-- name: Wireguard | Debian | Purge | Stopping orphaned tunnel
+- name: Wireguard | Purge | Stopping orphaned tunnel
   ansible.builtin.command: "wg-quick down {{ existing_int | replace('.conf', '') }}"
   ignore_errors: true
   failed_when: false
@@ -54,7 +54,7 @@
     loop_var: existing_int
   loop: "{{ wg_existing_ints.stdout_lines }}"
 
-- name: Wireguard | Debian | Purge | Purging orphaned tunnel-config
+- name: Wireguard | Purge | Purging orphaned tunnel-config
   ansible.builtin.file:
     path: "{{ WG_HC.path_config }}/{{ existing_int }}"
     state: absent
