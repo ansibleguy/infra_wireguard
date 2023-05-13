@@ -1,12 +1,12 @@
 ---
 
-- name: "Wireguard | Debian | Topology {{ topo_name }} | Checking config"
+- name: "Wireguard | Topology {{ topo_name }} | Checking config"
   ansible.builtin.assert:
     that:
       - "topology.type in ['single', 'star', 'mesh']"
   tags: [tunnels, config]
 
-- name: "Wireguard | Debian | Topology {{ topo_name }} | Checking star-config"
+- name: "Wireguard | Topology {{ topo_name }} | Checking star-config"
   ansible.builtin.fail:
     msg: 'UNSUPPORTED CONFIG: You have supplied more than one center-server for this star-topology!'
   when:
@@ -14,12 +14,12 @@
     - not topology.peers | one_center
   tags: [tunnels, config]
 
-- name: "Wireguard | Debian | Topology {{ topo_name }} | Setting psk file"
+- name: "Wireguard | Topology {{ topo_name }} | Setting psk file"
   ansible.builtin.set_fact:
     psk_file: "{{ WG_CONFIG.controller_key_store }}/{{ topo_name }}.{{ WG_HC.ext.psk }}"
   tags: [tunnels, config]
 
-- name: "Wireguard | Debian | Topology {{ topo_name }} | Checking if psk exists on the controller"
+- name: "Wireguard | Topology {{ topo_name }} | Checking if psk exists on the controller"
   ansible.builtin.stat:
     path: "{{ psk_file }}"
   register: wg_psk_file
@@ -29,7 +29,7 @@
   throttle: 1
   tags: [tunnels, config]
 
-- name: "Wireguard | Debian | Topology {{ topo_name }} | Generating missing psk"
+- name: "Wireguard | Topology {{ topo_name }} | Generating missing psk"
   ansible.builtin.command: 'wg genpsk'
   register: wg_psk_gen
   throttle: 1
@@ -39,7 +39,7 @@
     - not wg_psk_file.stat.exists
   tags: [tunnels, config]
 
-- name: "Wireguard | Debian | Topology {{ topo_name }} | Writing psk to file on controller"
+- name: "Wireguard | Topology {{ topo_name }} | Writing psk to file on controller"
   ansible.builtin.copy:
     content: "{{ wg_psk_gen.stdout }}"
     dest: "{{ psk_file }}"
@@ -52,7 +52,7 @@
     - not wg_psk_file.stat.exists
   tags: [tunnels, config]
 
-- name: "Wireguard | Debian | Topology {{ topo_name }} | Checking host-keys"
+- name: "Wireguard | Topology {{ topo_name }} | Checking host-keys"
   ansible.builtin.include_tasks: keys.yml
   vars:
     host: "{{ host_item.key }}"
@@ -65,7 +65,7 @@
     apply:
       tags: [tunnels, config]
 
-- name: "Wireguard | Debian | Topology {{ topo_name }} | Processing host"
+- name: "Wireguard | Topology {{ topo_name }} | Processing host"
   ansible.builtin.include_tasks: host.yml
   when: inventory_hostname == host
   vars:

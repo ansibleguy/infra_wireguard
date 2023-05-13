@@ -1,6 +1,6 @@
 ---
 
-- name: "Wireguard | Debian | Topology {{ topo_name }} | Host | Copying keys to target host"
+- name: "Wireguard | Topology {{ topo_name }} | Host | Copying keys to target host"
   ansible.builtin.copy:
     src: "{{ WG_CONFIG.controller_key_store }}/{{ item }}"
     dest: "{{ WG_CONFIG.path_keys }}/{{ item }}"
@@ -13,7 +13,7 @@
   no_log: true
   tags: [tunnels, config]
 
-- name: "Wireguard | Debian | Topology {{ topo_name }} | Host | Configuring tunnel for topology 'single'"
+- name: "Wireguard | Topology {{ topo_name }} | Host | Configuring tunnel for topology 'single'"
   ansible.builtin.include_tasks: tunnel/single.yml
   vars:
     privkey_file_full: "{{ WG_CONFIG.path_keys }}/{{ topo_name }}_{{ host }}.{{ WG_HC.ext.key }}"
@@ -24,7 +24,7 @@
     apply:
       tags: [tunnels, config]
 
-- name: "Wireguard | Debian | Topology {{ topo_name }} | Host | Configuring tunnel for topology 'star'"
+- name: "Wireguard | Topology {{ topo_name }} | Host | Configuring tunnel for topology 'star'"
   ansible.builtin.include_tasks: tunnel/star.yml
   vars:
     privkey_file_full: "{{ WG_CONFIG.path_keys }}/{{ topo_name }}_{{ host }}.{{ WG_HC.ext.key }}"
@@ -35,7 +35,7 @@
     apply:
       tags: [tunnels, config]
 
-- name: "Wireguard | Debian | Topology {{ topo_name }} | Host | Configuring tunnel for topology 'star'"
+- name: "Wireguard | Topology {{ topo_name }} | Host | Configuring tunnel for topology 'star'"
   ansible.builtin.include_tasks: tunnel/mesh.yml
   vars:
     privkey_file_full: "{{ WG_CONFIG.path_keys }}/{{ topo_name }}_{{ host }}.{{ WG_HC.ext.key }}"

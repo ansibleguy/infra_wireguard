@@ -1,12 +1,12 @@
 ---
 
-- name: "Wireguard | Debian | Topology {{ topo_name }} | {{ host }} keys | Setting key files"
+- name: "Wireguard | Topology {{ topo_name }} | {{ host }} keys | Setting key files"
   ansible.builtin.set_fact:
     pubkey_file: "{{ WG_CONFIG.controller_key_store }}/{{ topo_name }}_{{ host }}.{{ WG_HC.ext.pub }}"
     privkey_file: "{{ WG_CONFIG.controller_key_store }}/{{ topo_name }}_{{ host }}.{{ WG_HC.ext.key }}"
   tags: [tunnels, config]
 
-- name: "Wireguard | Debian | Topology {{ topo_name }} | {{ host }} keys | Checking if key exist on the controller"
+- name: "Wireguard | Topology {{ topo_name }} | {{ host }} keys | Checking if key exist on the controller"
   ansible.builtin.stat:
     path: "{{ item }}"
   register: wg_key_files
@@ -18,7 +18,7 @@
     - "{{ privkey_file }}"
   tags: [tunnels, config]
 
-- name: "Wireguard | Debian | Topology {{ topo_name }} | {{ host }} keys | Generating missing key"
+- name: "Wireguard | Topology {{ topo_name }} | {{ host }} keys | Generating missing key"
   ansible.builtin.command: 'wg genkey'
   when: not wg_key_files.results | all_exist
   register: wg_key_gen
@@ -27,7 +27,7 @@
   changed_when: false
   tags: [tunnels, config]
 
-- name: "Wireguard | Debian | Topology {{ topo_name }} | {{ host }} keys | Generating missing public-key"
+- name: "Wireguard | Topology {{ topo_name }} | {{ host }} keys | Generating missing public-key"
   ansible.builtin.command: 'wg pubkey'
   args:
     stdin: "{{ wg_key_gen.stdout }}"
@@ -39,7 +39,7 @@
   tags: [tunnels, config]
 
 # NOTE: workaround for race-condition while writing keys - sometimes pk didn't match pub
-- name: "Wireguard | Debian | Topology {{ topo_name }} | {{ host }} keys | Writing keys to file on controller"
+- name: "Wireguard | Topology {{ topo_name }} | {{ host }} keys | Writing keys to file on controller"
   ansible.builtin.debug:
     msg: "{{ wg_pub_gen.stdout | write_keys(pubkey_file, wg_key_gen.stdout, privkey_file) }}"
   no_log: true

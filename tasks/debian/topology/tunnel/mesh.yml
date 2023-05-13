@@ -1,18 +1,18 @@
 ---
 
-- name: "Wireguard | Debian | Topology {{ topo_name }} | Mesh | Tunnel | Checking config"
+- name: "Wireguard | Topology {{ topo_name }} | Mesh | Tunnel | Checking config"
   ansible.builtin.include_tasks: check.yml
   tags: [tunnels, config]
   args:
     apply:
       tags: [tunnels, config]
 
-- name: "Wireguard | Debian | Topology {{ topo_name }} | Mesh | Tunnel | Building mesh-config"
+- name: "Wireguard | Topology {{ topo_name }} | Mesh | Tunnel | Building mesh-config"
   ansible.builtin.set_fact:
     wg_peers: "{{ topology.peers | mesh_peers(inventory_hostname) }}"
   tags: [tunnels, config]
 
-- name: "Wireguard | Debian | Topology {{ topo_name }} | Mesh | Tunnel | Configuring tunnel"
+- name: "Wireguard | Topology {{ topo_name }} | Mesh | Tunnel | Configuring tunnel"
   ansible.builtin.template:
     src: 'templates/etc/wireguard/many.conf.j2'
     dest: "/etc/wireguard/{{ int_name }}.conf"
@@ -22,7 +22,7 @@
   register: wg_config
   tags: [tunnels, config]
 
-- name: "Wireguard | Debian | Topology {{ topo_name }} | Mesh | Tunnel | Adding service"
+- name: "Wireguard | Topology {{ topo_name }} | Mesh | Tunnel | Adding service"
   ansible.builtin.include_tasks: service.yml
   tags: [tunnels, config]
   args:

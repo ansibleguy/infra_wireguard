@@ -1,13 +1,13 @@
 ---
 
-- name: "Wireguard | Debian | Topology {{ topo_name }} | Single | Tunnel | Checking config"
+- name: "Wireguard | Topology {{ topo_name }} | Single | Tunnel | Checking config"
   ansible.builtin.include_tasks: check.yml
   tags: [tunnels, config]
   args:
     apply:
       tags: [tunnels, config]
 
-- name: "Wireguard | Debian | Topology {{ topo_name }} | Single | Tunnel | Getting peer config"
+- name: "Wireguard | Topology {{ topo_name }} | Single | Tunnel | Getting peer config"
   ansible.builtin.set_fact:
     peer_name: "{{ peer_item.key }}"
     wg_peer: "{{ defaults_peer | combine(peer_item.value, recursive=true) }}"
@@ -18,7 +18,7 @@
   with_dict: "{{ topology.peers }}"
   tags: [tunnels, config]
 
-- name: "Wireguard | Debian | Topology {{ topo_name }} | Single | Tunnel | Configuring tunnel"
+- name: "Wireguard | Topology {{ topo_name }} | Single | Tunnel | Configuring tunnel"
   ansible.builtin.template:
     src: 'templates/etc/wireguard/single.conf.j2'
     dest: "/etc/wireguard/{{ int_name }}.conf"
@@ -28,7 +28,7 @@
   register: wg_config
   tags: [tunnels, config]
 
-- name: "Wireguard | Debian | Topology {{ topo_name }} | Single | Tunnel | Adding service"
+- name: "Wireguard | Topology {{ topo_name }} | Single | Tunnel | Adding service"
   ansible.builtin.include_tasks: service.yml
   tags: [tunnels, config]
   args:

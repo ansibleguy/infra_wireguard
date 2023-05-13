@@ -1,11 +1,11 @@
 ---
 
-- name: "Wireguard | Debian | Topology {{ topo_name }} | Star | Tunnel | Building center-config"
+- name: "Wireguard | Topology {{ topo_name }} | Star | Tunnel | Building center-config"
   ansible.builtin.set_fact:
     wg_peers: "{{ topology.peers | star_edge_peers }}"
   tags: [tunnels, config]
 
-- name: "Wireguard | Debian | Topology {{ topo_name }} | Star | Tunnel | Configuring tunnel"
+- name: "Wireguard | Topology {{ topo_name }} | Star | Tunnel | Configuring tunnel"
   ansible.builtin.template:
     src: 'templates/etc/wireguard/many.conf.j2'
     dest: "/etc/wireguard/{{ int_name }}.conf"
