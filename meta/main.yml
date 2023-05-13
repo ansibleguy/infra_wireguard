@@ -5,7 +5,7 @@ galaxy_info:
   namespace: 'ansibleguy'
   license: 'GPLv3'
   issue_tracker_url: 'https://github.com/ansibleguy/infra_wireguard/issues'
-  min_ansible_version: 2.14
+  min_ansible_version: '2.14'
   description: 'Role to configure WireGuard Site-to-Site tunnels - topology-based'
   platforms:
     - name: Debian
