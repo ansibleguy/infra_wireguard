@@ -1,0 +1,58 @@
+---
+
+name: AutoLint
+
+on:
+  push:
+    branches: [main, stable, latest]
+  pull_request:
+    branches: [main, stable, latest]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        python-version: [3.10]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Switch to Current Branch
+        run: git checkout ${{ env.BRANCH }}
+        shell: bash
+
+      - name: Install python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements_lint.txt
+        shell: bash
+
+      - name: Running PyLint
+        run: pylint --recursive=y .
+        shell: bash
+
+      - name: Running PyLint (*.py.j2)
+        run: |
+          if [ -f ".pylintrc_j2" ]; then j2_cnf=".pylintrc_j2"; else j2_cnf='.pylintrc'; fi
+          find -type f -name *.py.j2 -print0 | xargs --no-run-if-empty -0 -n1 pylint --rcfile "$(pwd)/${j2_cnf}"
+        shell: bash
+
+      - name: Running YamlLint
+        run: yamllint .
+        shell: bash
+
+      - name: Preparing collection for AnsibleLint
+        run: |
+          mkdir -p "/tmp/ansible_lint/roles/ansibleguy.${{ github.event.repository.name }}"
+          ln -s "${{ github.workspace }}" "/tmp/ansible_lint/roles/ansibleguy.${{ github.event.repository.name }}"
+        shell: bash
+
+      - name: Running AnsibleLint
+        run: ANSIBLE_ROLES_PATH=/tmp/ansible_lint/roles/ ansible-lint -c .ansible-lint.yml
+        shell: bash

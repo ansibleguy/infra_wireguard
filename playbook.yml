@@ -3,7 +3,8 @@
 # ansible-playbook -K -D -i inventory/hosts.yml playbook.yml
 # ansible-playbook -K -D -i inventory/hosts.yml playbook.yml --ask-vault-pass
 
-- hosts: all   # should be limited
+- name: WireGuard Site-to-Site
+  hosts: all   # should be limited
   become: true
   gather_facts: yes
   roles:
