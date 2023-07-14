@@ -8,8 +8,8 @@ Role to deploy WireGuard Site-to-Site VPN setups.
 [![YamlLint Test Status](https://badges.ansibleguy.net/infra_wireguard.yamllint.svg)](https://github.com/ansibleguy/_meta_cicd/blob/latest/templates/usr/local/bin/cicd/yamllint.sh.j2)
 [![PyLint Test Status](https://badges.ansibleguy.net/infra_wireguard.pylint.svg)](https://github.com/ansibleguy/_meta_cicd/blob/latest/templates/usr/local/bin/cicd/pylint.sh.j2)
 [![Ansible-Lint Test Status](https://badges.ansibleguy.net/infra_wireguard.ansiblelint.svg)](https://github.com/ansibleguy/_meta_cicd/blob/latest/templates/usr/local/bin/cicd/ansiblelint.sh.j2)
-[![Ansible Galaxy](https://img.shields.io/ansible/role/57785)](https://galaxy.ansible.com/ansibleguy/infra_wireguard)
-[![Ansible Galaxy Downloads](https://img.shields.io/badge/dynamic/json?color=blueviolet&label=Galaxy%20Downloads&query=%24.download_count&url=https%3A%2F%2Fgalaxy.ansible.com%2Fapi%2Fv1%2Froles%2F57785%2F%3Fformat%3Djson)](https://galaxy.ansible.com/ansibleguy/infra_wireguard)
+[![Ansible Galaxy](https://img.shields.io/ansible/role/62779)](https://galaxy.ansible.com/ansibleguy/infra_wireguard)
+[![Ansible Galaxy Downloads](https://img.shields.io/badge/dynamic/json?color=blueviolet&label=Galaxy%20Downloads&query=%24.download_count&url=https%3A%2F%2Fgalaxy.ansible.com%2Fapi%2Fv1%2Froles%2F62779%2F%3Fformat%3Djson)](https://galaxy.ansible.com/ansibleguy/infra_wireguard)
 
 **Tested:**
 * Debian 11
