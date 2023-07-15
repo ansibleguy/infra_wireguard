@@ -31,7 +31,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r requirements_lint.txt
-          ansible-galaxy collection install -r "${{ github.workspace }}/${{ github.event.repository.name }}/molecule/default/requirements.yml"
+          ansible-galaxy collection install -r "${{ github.workspace }}/molecule/default/requirements.yml"
         shell: bash
 
       - name: Running PyLint
@@ -51,7 +51,7 @@ jobs:
       - name: Preparing for AnsibleLint
         run: |
           mkdir -p "/tmp/ansible_lint/roles/
-          ln -s "${{ github.workspace }}/${{ github.event.repository.name }}" "/tmp/ansible_lint/roles/ansibleguy.${{ github.event.repository.name }}"
+          ln -s "${{ github.workspace }}" "/tmp/ansible_lint/roles/ansibleguy.${{ github.event.repository.name }}"
         shell: bash
 
       - name: Running AnsibleLint
