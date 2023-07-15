@@ -55,6 +55,8 @@ jobs:
 
       - name: Installing AnsibleLint requirements
         run: |
+          ls /tmp/ansible_lint/roles/
+          ls "/tmp/ansible_lint/roles/ansibleguy.${{ github.event.repository.name }}"
           ansible-galaxy collection install -r "/tmp/ansible_lint/roles/ansibleguy.${{ github.event.repository.name }}/molecule/requirements.yml"
         shell: bash
 
