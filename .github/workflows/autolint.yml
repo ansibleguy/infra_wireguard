@@ -50,7 +50,7 @@ jobs:
 
       - name: Preparing for AnsibleLint
         run: |
-          mkdir -p "/tmp/ansible_lint/roles/
+          mkdir -p '/tmp/ansible_lint/roles/'
           ln -s "${{ github.workspace }}" "/tmp/ansible_lint/roles/ansibleguy.${{ github.event.repository.name }}"
         shell: bash
 
