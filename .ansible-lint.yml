@@ -10,3 +10,5 @@ skip_list:
   - 'yaml'
   - '204'  # line length => checked by yamllint
   - 'name[template]'
+  - 'run-once[play]'  # only used in molecule
+  - 'run-once[task]'  # only used in molecule
