@@ -31,7 +31,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r requirements_lint.txt
-          ansible-galaxy collection install -r molecule/requirements.yml
+          ansible-galaxy collection install -r "${{ github.workspace }}/molecule/requirements.yml"
         shell: bash
 
       - name: Running PyLint
