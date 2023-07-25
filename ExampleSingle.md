@@ -4,7 +4,7 @@
 
 This was done before running this example:
 
-* Basic host-setup => using [THIS](https://github.com/ansibleguy/linub_bootstrap) role
+* Basic host-setup => using [THIS](https://github.com/ansibleguy/linux_bootstrap) role
 * Network-interfaces and -capabilities => using [THIS](https://github.com/ansibleguy/linux_networking) role
 * Allowing traffic for the used ports => using [THIS](https://github.com/ansibleguy/linux_ufw) role
 
