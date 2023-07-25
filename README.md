@@ -286,7 +286,7 @@ guy@srv:~# tcpdump -i wgs_ts2
 
 * Check if a firewall is blocking any traffic between the hosts.
   
-  UFW per example needs to allow incoming AND forwarding traffic.
+  IPTables/NFTables per example need to allow incoming AND forwarding traffic.
 
 * Check your routing configuration for errors and compare it against the 'running config':
 

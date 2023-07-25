@@ -7,7 +7,7 @@ This was done before running this example:
 
 * Basic host-setup => using [THIS](https://github.com/ansibleguy/linux_bootstrap) role
 * Network-interfaces and -capabilities => using [THIS](https://github.com/ansibleguy/linux_networking) role
-* Allowing traffic for the used ports => using [THIS](https://github.com/ansibleguy/linux_ufw) role
+* Allowing traffic for the used ports => using [THIS](https://github.com/ansibleguy/infra_nftables) role
 
 ## Config
 
@@ -27,7 +27,7 @@ You have to mind some cases when you configure a star-topology:
   
   If you want to configure a redundant star-topology => just use two.
 
-* Don't forget to allowed forwarded traffic using iptables or ufw!
+* Don't forget to allowed forwarded traffic using [IPTables](https://github.com/ansibleguy/linux_ufw) or [NFTables](https://github.com/ansibleguy/infra_nftables)!
 
 * Auto-added routes depend on correctly configured 'AllowedIPs'.
 
