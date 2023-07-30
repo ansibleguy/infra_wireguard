@@ -16,13 +16,16 @@
     name: "{{ loaded_svc }}"
     enabled: false
     state: stopped
-    daemon_reload: yes
+    daemon_reload: true
   when: "loaded_svc.split('@')[1].split('.service')[0] not in wg_wanted_ints"
-  register: wg_svc_removal
-  ignore_errors: true
   loop_control:
     loop_var: loaded_svc
   loop: "{{ wg_svc_loaded.stdout_lines }}"
+  register: wg_svc_removal
+  failed_when:
+    - wg_svc_removal.failed
+    - "'does not exist' not in wg_svc_removal.msg"
+    - "'Could not find' not in wg_svc_removal.msg"
 
 - name: Wireguard | Purge | Removing non-existing tunnel-service-instances
   ansible.builtin.command: 'systemctl reset-failed'
