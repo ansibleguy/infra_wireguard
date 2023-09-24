@@ -2,8 +2,10 @@
 {% for net in wg_peer.AllowedIPs | ensure_list %}
 {%   for gw in wg_peer.Address | ensure_list %}
 {%     if gw.split('/')[0] != net.split('/')[0] %}
-{%       if (gw | ansible.utils.ipv4 and net | ansible.utils.ipv4) or (gw | ansible.utils.ipv6 and net | ansible.utils.ipv6) %}
+{%       if gw | ansible.utils.ipv4 and net | ansible.utils.ipv4 %}
 PostUp = ip route add {{ net }} dev %i metric {{ WG_HC.default_routing_metric + loop.index }} via {{ gw.split('/')[0] }}
+{%       elif gw | ansible.utils.ipv6 and net | ansible.utils.ipv6 %}
+PostUp = ip -6 route add {{ net }} dev %i metric {{ WG_HC.default_routing_metric + loop.index }} via {{ gw.split('/')[0] }}
 {%       endif %}
 {%     endif %}
 {%   endfor %}
