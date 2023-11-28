@@ -17,6 +17,10 @@ Role to deploy WireGuard Site-to-Site VPN setups.
 ## Install
 
 ```bash
+# latest
+ansible-galaxy role install git+https://github.com/ansibleguy/infra_wireguard
+
+# from galaxy
 ansible-galaxy install ansibleguy.infra_wireguard
 
 # or to custom role-path
