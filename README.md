@@ -10,6 +10,8 @@ Role to deploy WireGuard Site-to-Site VPN setups.
 [![Ansible-Lint Test Status](https://badges.ansibleguy.net/infra_wireguard.ansiblelint.svg)](https://github.com/ansibleguy/_meta_cicd/blob/latest/templates/usr/local/bin/cicd/ansiblelint.sh.j2)
 [![Ansible Galaxy](https://badges.ansibleguy.net/galaxy.badge.svg)](https://galaxy.ansible.com/ui/standalone/roles/ansibleguy/infra_wireguard)
 
+[Molecule Logs (if failed)](https://badges.ansibleguy.net/log/molecule_infra_wireguard_test.log)
+
 **Tested:**
 * Debian 11
 * Raspbian 11
