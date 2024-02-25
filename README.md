@@ -132,6 +132,8 @@ Feel free to:
 
 ## Usage
 
+You want a simple Ansible GUI? Check-out my [Ansible WebUI](https://github.com/ansibleguy/webui)
+
 ### Examples
 
 Here some detailed config examples and their results:
