@@ -220,8 +220,13 @@ provisioner:
     defaults:
       local_tmp: '/tmp/.ansible-$USER/tmp'
       remote_tmp: '/tmp/.ansible-$USER/tmp'
+      no_target_syslog: true
 verifier:
   name: ansible
+  config_options:
+    defaults:
+      remote_tmp: '/tmp'
+      no_target_syslog: true
 scenario:
   name: default
   test_sequence:
