@@ -26,7 +26,7 @@ jobs:
         shell: bash
 
       - name: Pulling logs
-        run: curl https://${{ env.CI_DOMAIN }}/api/job/${{ env.CI_JOB }}/logs?token=${{ secrets.CI_TOKEN_RW }} | jq > /tmp/test.log
+        run: curl -f https://${{ env.CI_DOMAIN }}/api/job/${{ env.CI_JOB }}/logs?token=${{ secrets.CI_TOKEN_RW }} | jq > /tmp/test.log
         shell: bash
 
       - uses: actions/upload-artifact@v4
