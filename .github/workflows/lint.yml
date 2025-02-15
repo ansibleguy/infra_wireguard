@@ -10,6 +10,10 @@ on:
       - '**.yml'
       - '.github/workflows/lint.yml'
       - 'requirements_lint.txt'
+      - '.yamllint'
+      - '.pylintrc'
+      - '.pylintrc_j2'
+      - '.ansible-lint.yml'
   pull_request:
     branches: [main, stable, latest]
     paths:
@@ -17,6 +21,10 @@ on:
       - '**.yml'
       - '.github/workflows/lint.yml'
       - 'requirements_lint.txt'
+      - '.yamllint'
+      - '.pylintrc'
+      - '.pylintrc_j2'
+      - '.ansible-lint.yml'
 
 jobs:
   lint:
