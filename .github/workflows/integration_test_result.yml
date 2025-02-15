@@ -26,7 +26,7 @@ jobs:
         shell: bash
 
       - name: Pulling logs
-        run: curl -f https://${{ env.CI_DOMAIN }}/api/job/${{ env.CI_JOB }}/logs?token=${{ secrets.CI_TOKEN_RW }} | jq > /tmp/test.log
+        run: curl --fail-with-body https://${{ env.CI_DOMAIN }}/api/job/${{ env.CI_JOB }}/logs?token=${{ secrets.CI_TOKEN_RW }} | jq > /tmp/test.log
         shell: bash
 
       - uses: actions/upload-artifact@v4
@@ -37,5 +37,5 @@ jobs:
 
       - name: Checking job-state
         run: >
-          curl https://${{ env.CI_DOMAIN }}/api/job/${{ env.CI_JOB }}/state?token=${{ secrets.CI_TOKEN_RW }} | jq -r '.state' | grep -q 'failed' && exit 1 || exit 0
+          curl --fail-with-body https://${{ env.CI_DOMAIN }}/api/job/${{ env.CI_JOB }}/state?token=${{ secrets.CI_TOKEN_RW }} | jq -r '.state' | grep -q 'failed' && exit 1 || exit 0
         shell: bash
