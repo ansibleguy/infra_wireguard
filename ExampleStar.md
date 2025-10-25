@@ -5,9 +5,9 @@
 
 This was done before running this example:
 
-* Basic host-setup => using [THIS](https://github.com/ansibleguy/linux_bootstrap) role
-* Network-interfaces and -capabilities => using [THIS](https://github.com/ansibleguy/linux_networking) role
-* Allowing traffic for the used ports => using [THIS](https://github.com/ansibleguy/infra_nftables) role
+* Basic host-setup => using [THIS](https://github.com/O-X-L/ansible-role-linux-bootstrap) role
+* Network-interfaces and -capabilities => using [THIS](https://github.com/O-X-L/ansible-role-linux-networking) role
+* Allowing traffic for the used ports => using [THIS](https://github.com/O-X-L/ansible-role-nftables) role
 
 ## Config
 
@@ -27,7 +27,7 @@ You have to mind some cases when you configure a star-topology:
   
   If you want to configure a redundant star-topology => just use two.
 
-* Don't forget to allowed forwarded traffic using [IPTables](https://github.com/ansibleguy/linux_ufw) or [NFTables](https://github.com/ansibleguy/infra_nftables)!
+* Don't forget to allowed forwarded traffic using [IPTables or NFTables](https://github.com/O-X-L/ansible-role-nftables)!
 
 * Auto-added routes depend on correctly configured 'AllowedIPs'.
 
@@ -66,12 +66,12 @@ wireguard:
       peers:
         srv03:
           role: 'center'
-          Endpoint: 'srv03.wg.template.ansibleguy.net'
+          Endpoint: 'srv03.wg.template.oxl.at'
           Address: "{{ site_networks.nl.ip }}/24"
           AllowedIPs: "{{ site_networks.super }}"  # can be list or single element
 
         srv04:
-          Endpoint: 'srv04.wg.template.ansibleguy.net'
+          Endpoint: 'srv04.wg.template.oxl.at'
           Address: "{{ site_networks.de.ip }}/24"
           AllowedIPs: "{{ site_networks.de.net }}"
 
@@ -87,7 +87,7 @@ wireguard:
 ### Controller
 
 ```bash
-guy@ansible:~# ls -l roles/ansibleguy.infra_wireguard/files/keys/
+guy@ansible:~# ls -l roles/oxlorg.wireguard/files/keys/
 > -rw-r----- dc_nl.psk
 > -rw-r----- dc_nl_srv03.key
 > -rw-r--r-- dc_nl_srv03.pub
@@ -99,7 +99,7 @@ guy@ansible:~# ls -l roles/ansibleguy.infra_wireguard/files/keys/
 
 You might want to use 'ansible-vault' to encrypt the private keys:
 ```bash
-ansible-vault encrypt roles/ansibleguy.infra_wireguard/files/keys/some_file.key
+ansible-vault encrypt roles/oxlorg.wireguard/files/keys/some_file.key
 ```
 
 ### SRV03 (center)
@@ -139,12 +139,12 @@ guy@srv03:~# systemctl status wg-quick@*
 >              https://www.wireguard.com/quickstart/
 >              https://git.zx2c4.com/wireguard-tools/about/src/man/wg-quick.8
 >              https://git.zx2c4.com/wireguard-tools/about/src/man/wg.8
->              https://github.com/ansibleguy/infra_wireguard
+>              https://github.com/O-X-L/ansible-role-wireguard
 
 # config
 guy@srv03:~# cat /etc/wireguard/wgx_dc_nl.conf 
 > # Ansible managed
-> # ansibleguy.infra_wireguard
+> # oxlorg.wireguard
 > 
 > # topology: star
 > # role: center
@@ -166,7 +166,7 @@ guy@srv03:~# cat /etc/wireguard/wgx_dc_nl.conf
 > PublicKey = Nujd72NiAZHzxBBIrXAs6JuoAhvkgKtp7zIe8+V7cio=
 > PresharedKey = NNMpluiPivWCGmV78jnkXyjL5JQYmr2/FFuIjp0Lxos=
 > AllowedIPs = 10.100.10.4/32, 192.168.40.0/24
-> Endpoint = srv04.wg.template.ansibleguy.net:51820
+> Endpoint = srv04.wg.template.oxl.at:51820
 > 
 > [Peer]
 > # srv07
@@ -208,7 +208,7 @@ guy@srv04:~# wg show all
 # config
 guy@srv04:~# cat /etc/wireguard/wgx_dc_nl.conf 
 > # Ansible managed
-> # ansibleguy.infra_wireguard
+> # oxlorg.wireguard
 > 
 > # topology: star
 > # role: edge
@@ -226,7 +226,7 @@ guy@srv04:~# cat /etc/wireguard/wgx_dc_nl.conf
 > PublicKey = BkxQWjX6k1QxP75uRxnFjCWOozNR9dJEQaWiPcXBDzE=
 > PresharedKey = NNMpluiPivWCGmV78jnkXyjL5JQYmr2/FFuIjp0Lxos=
 > AllowedIPs = 10.100.10.3/32, 192.168.0.0/17
-> Endpoint = srv03.wg.template.ansibleguy.net:51820
+> Endpoint = srv03.wg.template.oxl.at:51820
 
 # interfaces & routing
 guy@srv04:~# ip route show table all | grep -vE '^(broadcast|local)\s' 
@@ -261,7 +261,7 @@ guy@srv07:~# wg show all
 # config
 guy@srv07:~# cat /etc/wireguard/wgx_dc_nl.conf 
 > # Ansible managed
-> # ansibleguy.infra_wireguard
+> # oxlorg.wireguard
 > 
 > # topology: star
 > # role: edge
@@ -281,7 +281,7 @@ guy@srv07:~# cat /etc/wireguard/wgx_dc_nl.conf
 > PublicKey = BkxQWjX6k1QxP75uRxnFjCWOozNR9dJEQaWiPcXBDzE=
 > PresharedKey = NNMpluiPivWCGmV78jnkXyjL5JQYmr2/FFuIjp0Lxos=
 > AllowedIPs = 10.100.10.3/32, 192.168.0.0/17
-> Endpoint = srv03.wg.template.ansibleguy.net:51820
+> Endpoint = srv03.wg.template.oxl.at:51820
 
 # interfaces & routing
 guy@srv07:~# ip route show table all | grep -vE '^(broadcast|local)\s' 

@@ -1,16 +1,18 @@
 ---
 
 galaxy_info:
-  author: 'AnsibleGuy <guy@ansibleguy.net>'
-  namespace: 'ansibleguy'
+  author: 'Rath Pascal <contact@oxl.at>'
+  namespace: 'oxlorg'
   license: 'MIT'
-  issue_tracker_url: 'https://github.com/ansibleguy/infra_wireguard/issues'
+  issue_tracker_url: 'https://github.com/O-X-L/ansible-role-wireguard/issues'
   min_ansible_version: '2.14'
   description: 'Role to configure WireGuard Site-to-Site tunnels - topology-based'
   platforms:
     - name: Debian
       versions:
         - bullseye
+        - bookworm
+        - trixies
   galaxy_tags:
     - 'networking'
     - 'vpn'

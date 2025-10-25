@@ -8,4 +8,4 @@
   become: true
   gather_facts: yes
   roles:
-    - ansibleguy.infra_wireguard
+    - oxlorg.wireguard

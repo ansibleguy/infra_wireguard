@@ -11,7 +11,7 @@ Check out the [Molecule Tutorial](https://github.com/ansibleguy/ansible_tutorial
 # Running
 
 ```bash
-cd roles/ansibleguy.infra_wireguard
+cd roles/oxlorg.wireguard
 # to run build the test instances, run the tests and clean up afterwards
 molecule test
 

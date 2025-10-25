@@ -4,9 +4,9 @@
 
 This was done before running this example:
 
-* Basic host-setup => using [THIS](https://github.com/ansibleguy/linux_bootstrap) role
-* Network-interfaces and -capabilities => using [THIS](https://github.com/ansibleguy/linux_networking) role
-* Allowing traffic for the used ports => using [THIS](https://github.com/ansibleguy/infra_nftables) role
+* Basic host-setup => using [THIS](https://github.com/O-X-L/ansible-role-linux-bootstrap) role
+* Network-interfaces and -capabilities => using [THIS](https://github.com/O-X-L/ansible-role-linux-networking) role
+* Allowing traffic for the used ports => using [THIS](https://github.com/O-X-L/ansible-role-nftables) role
 
 ## Config
 
@@ -32,12 +32,12 @@ wireguard:
       type: 'single'  # single => default type
       peers:
         srv03:
-          Endpoint: 'srv03.wg.template.ansibleguy.net'
+          Endpoint: 'srv03.wg.template.oxl.at'
           Address: '10.100.0.1/30'
           PostUp: ["ip route add {{ site_networks.de }} dev %i metric 100"]
 
         srv04:
-          Endpoint: 'srv04.wg.template.ansibleguy.net'
+          Endpoint: 'srv04.wg.template.oxl.at'
           Address: '10.100.0.2/30'
           PostUp: ["ip route add {{ site_networks.nl }} dev %i metric 10"]
 
@@ -45,7 +45,7 @@ wireguard:
       NATed: true  # srv07 is behind a firewall
       peers:
         srv03:
-          Endpoint: 'srv03.wg.template.ansibleguy.net'
+          Endpoint: 'srv03.wg.template.oxl.at'
           ListenPort: 51821  # srv03 already uses the default port for the nl2de connection
           Address: '10.100.0.5/30'
           AllowedIPs: ["{{ site_networks.nl }}"]
@@ -62,7 +62,7 @@ wireguard:
 ### Controller
 
 ```bash
-guy@ansible:~# ls -l roles/ansibleguy.infra_wireguard/files/keys/
+guy@ansible:~# ls -l roles/oxlorg.wireguard/files/keys/
 > -rw-r----- nl2at.psk
 > -rw-r----- nl2at_srv03.key
 > -rw-r--r-- nl2at_srv03.pub
@@ -77,7 +77,7 @@ guy@ansible:~# ls -l roles/ansibleguy.infra_wireguard/files/keys/
 
 You might want to use 'ansible-vault' to encrypt the private keys:
 ```bash
-ansible-vault encrypt roles/ansibleguy.infra_wireguard/files/keys/some_file.key
+ansible-vault encrypt roles/oxlorg.wireguard/files/keys/some_file.key
 ```
 
 ### SRV03 (two connections)
@@ -122,7 +122,7 @@ guy@srv03:~# systemctl status wg-quick@wgs_nl2at.service
 >              https://www.wireguard.com/quickstart/
 >              https://git.zx2c4.com/wireguard-tools/about/src/man/wg-quick.8
 >              https://git.zx2c4.com/wireguard-tools/about/src/man/wg.8
->              https://github.com/ansibleguy/infra_wireguard
+>              https://github.com/O-X-L/ansible-role-wireguard
 
 guy@srv03:~# systemctl status wg-quick@wgs_nl2de.service 
 > ● wg-quick@wgs_nl2de.service - WireGuard via wg-quick(8) for wgs_nl2de
@@ -136,7 +136,7 @@ guy@srv03:~# systemctl status wg-quick@wgs_nl2de.service
 >              https://www.wireguard.com/quickstart/
 >              https://git.zx2c4.com/wireguard-tools/about/src/man/wg-quick.8
 >              https://git.zx2c4.com/wireguard-tools/about/src/man/wg.8
->              https://github.com/ansibleguy/infra_wireguard
+>              https://github.com/O-X-L/ansible-role-wireguard
 
 # config
 guy@srv03:~# ls -l /etc/wireguard/
@@ -147,7 +147,7 @@ guy@srv03:~# ls -l /etc/wireguard/
 
 guy@srv03:~# cat /etc/wireguard/wgs_nl2at.conf 
 > # Ansible managed
-> # ansibleguy.infra_wireguard
+> # oxlorg.wireguard
 > 
 > # topology: single
 > 
@@ -167,7 +167,7 @@ guy@srv03:~# cat /etc/wireguard/wgs_nl2at.conf
 
 guy@srv03:~# cat /etc/wireguard/wgs_nl2de.conf 
 > # Ansible managed
-> # ansibleguy.infra_wireguard
+> # oxlorg.wireguard
 > 
 > # topology: single
 > 
@@ -184,7 +184,7 @@ guy@srv03:~# cat /etc/wireguard/wgs_nl2de.conf
 > PublicKey = V0WLyIRRHSCTOe8+POwsIUOlvxEfECoK1uqSPcenbH0=
 > PresharedKey = lhPeuFqJ1w4L14DnoDXFi9IrcrnZ8RZCYwhsYDDMEJ8=
 > AllowedIPs = 10.100.0.2/32, 0.0.0.0/0, ::/0
-> Endpoint = srv04.wg.template.ansibleguy.net:51820
+> Endpoint = srv04.wg.template.oxl.at:51820
 
 # interfaces & routing
 guy@srv03:~# route -n
@@ -226,7 +226,7 @@ guy@srv04:~# ls -l /etc/wireguard/
 
 guy@srv04:~# cat /etc/wireguard/nl2de.conf 
 > # Ansible managed
-> # ansibleguy.infra_wireguard
+> # oxlorg.wireguard
 > 
 > # topology: single
 > 
@@ -243,7 +243,7 @@ guy@srv04:~# cat /etc/wireguard/nl2de.conf
 > PublicKey = bUeQ1vZSzwRubjghV1tzVaFgh7kEls6hgG0O9IHKXwM=
 > PresharedKey = lhPeuFqJ1w4L14DnoDXFi9IrcrnZ8RZCYwhsYDDMEJ8=
 > AllowedIPs = 10.100.0.1/32, 0.0.0.0/0, ::/0
-> Endpoint = srv03.wg.template.ansibleguy.net:51820
+> Endpoint = srv03.wg.template.oxl.at:51820
 
 # interfaces & routing
 guy@srv04:~# route -n
@@ -283,7 +283,7 @@ guy@srv07:~# ls -l /etc/wireguard/
 
 guy@srv07:~# cat /etc/wireguard/nl2at.conf 
 > # Ansible managed
-> # ansibleguy.infra_wireguard
+> # oxlorg.wireguard
 > 
 > # topology: single
 > 
@@ -299,7 +299,7 @@ guy@srv07:~# cat /etc/wireguard/nl2at.conf
 > PublicKey = oqSWbjmFmA/YL+mMxABXERinS+EP/zLwvNQ8bBNnbDY=
 > PresharedKey = AHKseTdvRB/Uyf+KleIR3JsnqTjV2Ggx3w41nvnqn+Q=
 > AllowedIPs = 10.100.0.5/32, 192.168.30.0/24
-> Endpoint = srv03.wg.template.ansibleguy.net:51821
+> Endpoint = srv03.wg.template.oxl.at:51821
 > PersistentKeepalive = 25
 
 # interfaces & routing

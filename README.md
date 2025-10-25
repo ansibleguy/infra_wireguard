@@ -4,16 +4,16 @@
 
 Role to deploy WireGuard Site-to-Site VPN setups.
 
-[![Lint](https://github.com/ansibleguy/infra_wireguard/actions/workflows/lint.yml/badge.svg)](https://github.com/ansibleguy/infra_wireguard/actions/workflows/lint.yml)
-[![Ansible Galaxy](https://badges.ansibleguy.net/galaxy.badge.svg)](https://galaxy.ansible.com/ui/standalone/roles/ansibleguy/infra_wireguard)
+[![Lint](https://github.com/O-X-L/ansible-role-wireguard/actions/workflows/lint.yml/badge.svg)](https://github.com/O-X-L/ansible-role-wireguard/actions/workflows/lint.yml)
+[![Ansible Galaxy](https://badges.oss.oxl.app/galaxy.badge.svg)](https://galaxy.ansible.com/ui/standalone/roles/oxlorg/wireguard)
 
 **Molecule Integration-Tests**:
 
-* Status: [![Molecule Test Status](https://badges.ansibleguy.net/infra_wireguard.molecule.svg)](https://github.com/ansibleguy/_meta_cicd/blob/latest/templates/usr/local/bin/cicd/molecule.sh.j2) |
-[![Functional-Tests](https://github.com/ansibleguy/infra_wireguard/actions/workflows/integration_test_result.yml/badge.svg)](https://github.com/ansibleguy/infra_wireguard/actions/workflows/integration_test_result.yml)
-* Logs: [API](https://ci.ansibleguy.net/api/job/ansible-test-molecule-infra_wireguard/logs?token=2b7bba30-9a37-4b57-be8a-99e23016ce70&lines=1000) | [Short](https://badges.ansibleguy.net/log/molecule_infra_wireguard_test_short.log) | [Full](https://badges.ansibleguy.net/log/molecule_infra_wireguard_test.log)
+* Status: [![Molecule Test Status](https://badges.oss.oxl.app/infra_wireguard.molecule.svg)](https://github.com/O-X-L/ansible-role-oxl-cicd/blob/latest/templates/usr/local/bin/cicd/molecule.sh.j2) |
+[![Functional-Tests](https://github.com/O-X-L/ansible-role-wireguard/actions/workflows/integration_test_result.yml/badge.svg)](https://github.com/O-X-L/ansible-role-wireguard/actions/workflows/integration_test_result.yml)
+* Logs: [API](https://ci.oss.oxl.app/api/job/ansible-test-molecule-infra_wireguard/logs?token=2b7bba30-9a37-4b57-be8a-99e23016ce70&lines=1000) | [Short](https://badges.oss.oxl.app/log/molecule_infra_wireguard_test_short.log) | [Full](https://badges.oss.oxl.app/log/molecule_infra_wireguard_test.log)
 
-Internal CI: [Tester Role](https://github.com/ansibleguy/_meta_cicd) | [Jobs API](https://github.com/O-X-L/github-self-hosted-jobs-systemd)
+Internal CI: [Tester Role](https://github.com/O-X-L/ansible-role-oxl-cicd) | [Jobs API](https://github.com/O-X-L/github-self-hosted-jobs-systemd)
 
 **Tested:**
 * Debian 11
@@ -26,13 +26,13 @@ Internal CI: [Tester Role](https://github.com/ansibleguy/_meta_cicd) | [Jobs API
 
 ```bash
 # latest
-ansible-galaxy role install git+https://github.com/ansibleguy/infra_wireguard
+ansible-galaxy role install git+https://github.com/O-X-L/ansible-role-wireguard
 
 # from galaxy
-ansible-galaxy install ansibleguy.infra_wireguard
+ansible-galaxy install oxlorg.wireguard
 
 # or to custom role-path
-ansible-galaxy install ansibleguy.infra_wireguard --roles-path ./roles
+ansible-galaxy install oxlorg.wireguard --roles-path ./roles
 
 # install dependencies
 ansible-galaxy install -r requirements.yml
@@ -59,9 +59,9 @@ Feel free to:
 
 Here some detailed config examples and their results:
 
-* [Topology - Single](https://github.com/ansibleguy/infra_wireguard/blob/stable/ExampleSingle.md)
-* [Topology - Star](https://github.com/ansibleguy/infra_wireguard/blob/stable/ExampleStar.md)
-* [Topology - Mesh](https://github.com/ansibleguy/infra_wireguard/blob/stable/ExampleMesh.md)
+* [Topology - Single](https://github.com/O-X-L/ansible-role-wireguard/blob/stable/ExampleSingle.md)
+* [Topology - Star](https://github.com/O-X-L/ansible-role-wireguard/blob/stable/ExampleStar.md)
+* [Topology - Mesh](https://github.com/O-X-L/ansible-role-wireguard/blob/stable/ExampleMesh.md)
 
 
 ### Config
@@ -81,17 +81,17 @@ wireguard:
       type: 'single'
       peers:
         srv02:
-          Endpoint: 'srv02.wg.template.ansibleguy.net'
+          Endpoint: 'srv02.wg.template.oxl.at'
           Address: '10.100.0.1/30'
 
         srv03:
-          Endpoint: 'srv03.wg.template.ansibleguy.net'
+          Endpoint: 'srv03.wg.template.oxl.at'
           Address: '10.100.0.2/30'
 ```
 
 You might want to use 'ansible-vault' to encrypt the host-key files:
 ```bash
-ansible-vault encrypt roles/ansibleguy.infra_wireguard/files/keys/some_file.key
+ansible-vault encrypt roles/oxlorg.wireguard/files/keys/some_file.key
 ```
 
 ### Execution
@@ -131,9 +131,9 @@ ansible-playbook -K -D -i inventory/hosts.yml playbook.yml -e only_topo=TOPOLOGY
 * **Configuration**
   * Simplified configuration by the mapping of **topologies**
   * **Supported topologies**:
-    * **[single](https://github.com/ansibleguy/infra_wireguard/blob/stable/ExampleSingle.md)** - simply connect two nodes
-    * **[star](https://github.com/ansibleguy/infra_wireguard/blob/stable/ExampleStar.md)** - multiple edge/branch nodes connect to one central hub
-    * **[mesh](https://github.com/ansibleguy/infra_wireguard/blob/stable/ExampleMesh.md)** - connect each of the peers to every other one
+    * **[single](https://github.com/O-X-L/ansible-role-wireguard/blob/stable/ExampleSingle.md)** - simply connect two nodes
+    * **[star](https://github.com/O-X-L/ansible-role-wireguard/blob/stable/ExampleStar.md)** - multiple edge/branch nodes connect to one central hub
+    * **[mesh](https://github.com/O-X-L/ansible-role-wireguard/blob/stable/ExampleMesh.md)** - connect each of the peers to every other one
   * **Keys**
     * Generating public/private key-pairs for each host in a topology (*WG identifies peer by publicKey*)
     * Keys are written to the controller for consistency
@@ -171,7 +171,7 @@ ansible-playbook -K -D -i inventory/hosts.yml playbook.yml -e only_topo=TOPOLOGY
 
 * **Note:** Most of the role's functionality can be opted in or out.
 
-  For all available options - see the default-config located in [the main defaults-file](https://github.com/ansibleguy/infra_wireguard/blob/latest/defaults/main/1_main.yml)!
+  For all available options - see the default-config located in [the main defaults-file](https://github.com/O-X-L/ansible-role-wireguard/blob/latest/defaults/main/1_main.yml)!
 
 
 * **Warning:** Not every setting/variable you provide will be checked for validity. Bad config might break the role!
@@ -191,7 +191,7 @@ ansible-playbook -K -D -i inventory/hosts.yml playbook.yml -e only_topo=TOPOLOGY
   * mesh => wgm_
   
 
-* **Info:** How to run tests is described [here](https://github.com/ansibleguy/infra_wireguard/blob/stable/molecule/default/Usage.md)
+* **Info:** How to run tests is described [here](https://github.com/O-X-L/ansible-role-wireguard/blob/stable/molecule/default/Usage.md)
 
 
 * **Info:** The host-keys will be saved in the roles 'files' directory by default. 
@@ -199,7 +199,7 @@ ansible-playbook -K -D -i inventory/hosts.yml playbook.yml -e only_topo=TOPOLOGY
   This key-directory can be changed using the 'controller_key_store' variable!
 
 
-* **Info:** If you are using **OPNSense firewalls** - you can use the [ansibleguy.opnsense Ansible collection](https://github.com/ansibleguy/collection_opnsense/blob/stable/docs/use_wireguard.md) to manage those WireGuard tunnels.
+* **Info:** If you are using **OPNSense firewalls** - you can use the [oxlorg.opnsense Ansible collection](https://github.com/O-X-L/ansible-opnsense/blob/stable/docs/use_wireguard.md) to manage those WireGuard tunnels.
 
 ----
 

@@ -186,4 +186,4 @@
               AllowedIPs: "{{ sites.m3.nw }}"
 
   roles:
-    - ansibleguy.infra_wireguard
+    - oxlorg.wireguard
